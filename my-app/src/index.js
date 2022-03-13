@@ -6,7 +6,7 @@ import RouteList from './RouteList';
 
 ReactDOM.render(
   <React.StrictMode>
-    <RouteList />
+    <App />
   </React.StrictMode>,
   document.getElementById('root')
 );
