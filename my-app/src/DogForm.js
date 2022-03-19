@@ -44,7 +44,7 @@ const DogForm = () => {
         </Form.Item>
         <Form.Item
             name="upload"
-            label="Upload"
+            label="Dog Picture"
             valuePropName="fileList"
             getValueFromEvent={normFile}
         >

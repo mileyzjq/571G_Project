@@ -1,5 +1,5 @@
 import { Card, Badge, Avatar, Modal, Skeleton } from 'antd';
-import { EuroCircleOutlined, LikeOutlined, DislikeOutlined, LikeTwoTone } from '@ant-design/icons';
+import { EuroCircleOutlined, LikeOutlined, DislikeOutlined, LikeTwoTone, DislikeTwoTone } from '@ant-design/icons';
 import dogImage from './image/dog1.jpg';
 import React, { useState } from 'react';
 
@@ -7,13 +7,22 @@ import React, { useState } from 'react';
 const DogCard = () => {
     const [profileVisible, setVisible] = useState(false);
     const [likeColor, setLikeColor] = useState(true);
+    const [dislikeColor, setDislikeColor] = useState(true);
 
     const hideModal = () => {
         setVisible(false);
     };
     
     const changeLikeColor = () => {
-        setLikeColor(!likeColor);
+        if(dislikeColor) {
+            setLikeColor(!likeColor);
+        }
+    };
+
+    const changeDislikeColor = () => {
+        if(likeColor) {
+            setDislikeColor(!dislikeColor);
+        }
     };
 
     return (
@@ -32,7 +41,9 @@ const DogCard = () => {
                 <div onClick={changeLikeColor}>
                     {likeColor ? <LikeOutlined /> : <LikeTwoTone key="dog-like" twoToneColor="red" style={{fontSize: 20}}/> }
                 </div>,
-                <DislikeOutlined key="dog-dislike" />,
+                <div onClick={changeDislikeColor}>
+                    {dislikeColor ? <DislikeOutlined /> : <DislikeTwoTone key="dog-dislike" twoToneColor="blue" style={{fontSize: 20}}/> }
+                </div>,
                 ]}
             >
             </Card>
