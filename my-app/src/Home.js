@@ -4,7 +4,8 @@ import { Divider, Button, Modal, Skeleton, Avatar, Card, Tabs } from 'antd';
 import DogCard from './DogCard';
 import React from 'react';
 import DogForm from './DogForm';
-import dogImage from './image/dog1.jpg';
+import dogImage1 from './image/dog1.jpg';
+import dogImage2 from './image/dog2.webp';
 
 class Home extends React.Component {
   constructor(props) {
@@ -50,8 +51,8 @@ class Home extends React.Component {
           <DogForm />
         </Modal>
         <div class="dog-card-container">
-          <DogCard class="dog-card-item" /> 
-          <DogCard class="dog-card-item" /> 
+          <DogCard class="dog-card-item" image={dogImage2} /> 
+          <DogCard class="dog-card-item" image={dogImage2} /> 
           <DogCard class="dog-card-item" /> 
         </div>
         <div class="dog-card-container">

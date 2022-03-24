@@ -32,6 +32,7 @@ class App extends React.Component {
   OperationsSlot = () => {
     return {
       left: iconTitle(),
+      //right: <Button type="primary" style={{marginRight: 20}} onClick={this.showLogin}>Login / Signup</Button>,
     };
   };
 

@@ -15,11 +15,11 @@ describe("Puppy Vote contract", function () {
     });
 
     it("Should not create a dog profile if do not have dog name", async function () {
-        await expect(voting.createDogProfile("", "female", "2020-01-02", "I am a dog")).to.be.revertedWith("Dog name can not be empty!");
+        await expect(voting.createDogProfile("", "female", "2020-01-02", ["cute", "lovely"], "I am a dog")).to.be.revertedWith("Dog name can not be empty!");
     });
 
     it("Should create a dog profile if everything is OK", async function () {
-        await expect(voting.createDogProfile("Nancy", "female", "2020-01-02", "I am a dog"));
+        await expect(voting.createDogProfile("Nancy", "female", "2020-01-02", ["nice"], "I am a dog"));
         expect(await voting.getLastDogName() === "Nancy");
     });
 
@@ -53,7 +53,7 @@ describe("Puppy Vote contract", function () {
     });
 
     it("Can vote if everything is Ok", async function () {
-        await expect(voting.connect(addr1).createDogProfile("Nancy", "female", "2020-01-02", "I am a dog"));
+        await expect(voting.connect(addr1).createDogProfile("Nancy", "female", "2020-01-02", ["nice"], "I am a dog"));
         await expect(voting.connect(addr1).buyVote(2,{value: "200000000000000000"}));//0.2ether
         await expect(voting.connect(addr1).vote(1,addr1.address));
         expect(await voting.userVoteBalance(addr1.address)).to.equal(1);
@@ -68,7 +68,7 @@ describe("Puppy Vote contract", function () {
 
     it("Owner can end the votes if everything is okay", async function () {
         const beforePurchaseBalance = await voting.connect(owner).getBalance();
-        await expect(voting.connect(addr1).createDogProfile("Nancy", "female", "2020-01-02", "I am a dog"));
+        await expect(voting.connect(addr1).createDogProfile("Nancy", "female", "2020-01-02", ["cute"], "I am a dog"));
         await expect(voting.connect(addr1).buyVote(2,{value: "200000000000000000"}));//0.2ether
         await expect(voting.connect(addr1).vote(2,addr1.address));
         await expect(voting.connect(owner).endVote());

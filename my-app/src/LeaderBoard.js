@@ -1,11 +1,28 @@
-import { Table, Tag, Space, Button, Avatar, message } from 'antd';
-import React from 'react';
+import { Table, Tag, Space, Button, Avatar, message, Modal, Result } from 'antd';
+import React, { useState } from 'react';
 import './App.css';
 import dogImage from './image/dog1.jpg';
+import dogImage2 from './image/dog2.webp';
+import crown from './image/crown.webp';
 
 const success = () => {
     message.success('Vote Successfully!');
 };
+
+const countDown = () => {
+  const modal = Modal.success({
+    title: 'End Vote successfully',
+    width: "36%",
+    content: (<Result
+      icon={<div><img src={crown} alt="crown" style={{marginTop: -50, width: 200, height: 200}}/> <Avatar src={dogImage2} style={{width: 160, height: 160, marginTop: -78}} /></div>}
+      title="Congratulations! John won $20!"
+    />),
+    footer: null
+  });
+  setTimeout(() => {
+    modal.destroy();
+  }, 6000);
+}
 
 const columns = [
   {
@@ -13,7 +30,7 @@ const columns = [
     dataIndex: 'avatar',
     key: 'avatar',
     className: "table-replaceColor",
-    render: avatar => <Avatar src={dogImage} />,
+    render: avatar => <Avatar src={dogImage2} />,
   },
   {
     title: 'Name',
@@ -50,7 +67,7 @@ const columns = [
       <span>
         {tags.map(tag => {
           let color = tag.length > 5 ? 'geekblue' : 'green';
-          if (tag === 'loser') {
+          if (tag === 'lazy' || tag === 'pretty') {
             color = 'volcano';
           }
           return (
@@ -89,7 +106,7 @@ const data = [
     age: 3,
     gender: 'female',
     votes: 222,
-    tags: ['loser'],
+    tags: ['lazy'],
   },
   {
     key: '3',
@@ -99,25 +116,35 @@ const data = [
     votes: 111,
     tags: ['cool', 'smart'],
   },
+  {
+    key: '4',
+    name: 'Sally',
+    age: 1,
+    gender: 'female',
+    votes: 101,
+    tags: ['nice', 'pretty'],
+  },
+  {
+    key: '5',
+    name: 'Nancy',
+    age: 4,
+    gender: 'female',
+    votes: 50,
+    tags: ['naughty'],
+  },
 ];
 
-class LeaderBoard extends React.Component {
-  state = {
-    top: 'topLeft',
-    bottom: 'bottomRight',
-  };
+const LeaderBoard = () => {
 
-  render() {
-    return (
-      <div style={{width: "90%", marginLeft: "4%", color: "#f7f7f7", marginTop: "40"}}>
-        <Table
-          columns={columns}
-          pagination={{ position: [this.state.bottom] }}
-          dataSource={data}
-        />
-      </div>
-    );
-  }
+  return (
+    <div style={{width: "90%", marginLeft: "4%", color: "#f7f7f7", marginTop: "40"}}>
+      <Button type="primary" onClick={countDown} style={{marginBottom: 15}}> End Vote </Button>
+      <Table
+        columns={columns}
+        dataSource={data}
+      />
+    </div>
+  );
 }
 
 export default LeaderBoard;

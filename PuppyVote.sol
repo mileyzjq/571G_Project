@@ -13,6 +13,7 @@ contract PuppyVote{
         string puppyName;
         string gender;
         string dateOfBirth;
+        string[] tags;
         string description;
         // one variable for picture 
         // string dogPicture;
@@ -37,10 +38,10 @@ contract PuppyVote{
         _;
     }
 
-    function createDogProfile(string memory _name, string memory _gender, string memory _birthday, string memory _description) public notEmpty (_name){
+    function createDogProfile(string memory _name, string memory _gender, string memory _birthday, string[] memory _tags, string memory _description) public notEmpty (_name){
         //users.push(User(msg.sender)); 
         //get info from web 
-        Dog memory newDog = Dog(msg.sender, 0, _name, _gender, _birthday, _description);
+        Dog memory newDog = Dog(msg.sender, 0, _name, _gender, _birthday, _tags, _description);
         adopt[msg.sender] = newDog;
         dogs.push(newDog);
     }
