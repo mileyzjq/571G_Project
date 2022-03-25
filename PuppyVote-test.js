@@ -76,4 +76,13 @@ describe("Puppy Vote contract", function () {
         await expect(afterPurchaseBalance).to.equal(beforePurchaseBalance);
     });
 
+    it("After owner end the votes, dogs's vote number should be reset to zero", async function () {
+
+        await expect(voting.connect(addr1).createDogProfile("Nancy", "female", "2020-01-02", ["cute"], "I am a dog"));
+        await expect(voting.connect(addr1).buyVote(2,{value: "200000000000000000"}));//0.2ether
+        await expect(voting.connect(addr1).vote(2,addr1.address));
+        await expect(voting.connect(owner).endVote());
+        expect(await (voting.getAdoptDogVote(addr1.address))).to.equal(0);
+    });
+
 });

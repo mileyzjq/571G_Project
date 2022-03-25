@@ -90,6 +90,7 @@ contract PuppyVote{
         address winner = winningDog.ownerAddress;
         payable(winner).transfer(address(this).balance);
         //payable(owner).transfer(address(this).balance);//transfer money back to owner
+        reset();
     }
 
     function rank() public returns (Dog[] memory){
@@ -104,6 +105,18 @@ contract PuppyVote{
             }
         }
         return dogs;
+    }
+
+    function reset() public {
+        uint256 l = dogs.length;
+        for (uint i = 0; i < l; i++) {
+            dogs[i].numVote=0;//reset to zero
+        }
+        uint256 len = users.length;
+
+        for (uint i = 0; i < len; i++) {
+            adopt[users[i].userAddress].numVote=0;//reset to zero
+        }
     }
     
     function getDogs() public view returns (Dog[] memory) {
