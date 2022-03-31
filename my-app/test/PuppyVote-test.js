@@ -1,36 +1,39 @@
-const { expect } = require("chai");
-//const { ethers } = require("ethers");
+require('chai')
+  .use(require('chai-as-promised'))
+  .should()
 
-describe("Puppy Vote contract", function () {
+const puppyVote = artifacts.require("PuppyVote");
+
+contract("PuppyVote", (accounts) => {
     let VotingShop;
     let voting;
-    let owner;
-    let addr1;
+    let owner = accounts[0];
+    let addr1 = accounts[1];
     let addr2;
     
     beforeEach(async function () {
-        VotingShop = await ethers.getContractFactory("PuppyVote");
-        [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
-        voting = await VotingShop.connect(owner).deploy();//admin = owner;
+        //VotingShop = await puppyVote.new({from: owner});
+        //[owner, addr1, addr2, ...addrs] = await ethers.getSigners();
+        voting = await puppyVote.new({from: owner});;//admin = owner;
     });
 
     it("Should not create a dog profile if do not have dog name", async function () {
-        await expect(voting.createDogProfile("", "female", "2020-01-02", ["cute", "lovely"], "I am a dog")).to.be.revertedWith("Dog name can not be empty!");
+        await voting.createDogProfile("", "female", "2020-01-02", ["cute", "lovely"], "I am a dog").should.be.rejectedWith("Dog name can not be empty!");
     });
 
     it("Should create a dog profile if everything is OK", async function () {
-        await expect(voting.createDogProfile("Nancy", "female", "2020-01-02", ["nice"], "I am a dog"));
-        expect(await voting.getLastDogName() === "Nancy");
+        await voting.createDogProfile("Nancy", "female", "2020-01-02", ["nice"], "I am a dog");
+        expect(await voting.getLastDogName()).to.be.eq("Nancy");
     });
 
     it("Should cannot buy vote if do not send enough money", async function () {
-        await expect(voting.buyVote(2,{value: "100000000000000000"})).to.be.revertedWith("Not enough money");
+        await voting.buyVote(2,{value: "100000000000000000"}).should.be.rejectedWith("Not enough money");
     });
 
     // bug fixed
     it("Should buy vote if everything is OK", async function () {
-        await expect(voting.connect(addr1).buyVote(2,{value: "200000000000000000"}));//0.2ether
-        expect(await voting.userVoteBalance(addr1.address)).to.equal(2);
+        await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
+        expect(Number(await voting.userVoteBalance(addr1))).to.be.eq(2);
         // console.log(addr1.getAddress());
         //console.log(await voting.connect(addr1).buyVote(2, {value: "200000000000000000"}));
     });  
