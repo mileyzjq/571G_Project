@@ -39,53 +39,54 @@ contract("PuppyVote", (accounts) => {
     });  
     
     it("Could not cancel order if not enough vote", async function () {
-        await expect(voting.connect(addr1).buyVote(2,{value: "200000000000000000"}));//0.2ether
-        await expect(voting.connect(addr1).cancelOrder(5)).to.be.revertedWith("requested cancel votes exceeded the total votes available");
+        await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
+        await voting.cancelOrder(5, {from: addr1}).should.be.rejectedWith("requested cancel votes exceeded the total votes available");
     });  
 
     
     it("Can cancel the order if everything is okay", async function () {
-        await expect(voting.connect(addr1).buyVote(2,{value: "200000000000000000"}));//0.2ether
-        await expect(voting.connect(addr1).cancelOrder(2));
-        expect(await voting.userVoteBalance(addr1.address)).to.equal(0);
+        await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
+        await voting.cancelOrder(2, {from: addr1});
+        expect(Number(await voting.userVoteBalance(addr1))).to.be.eq(0);
     });
 
     it("Can not vote if not enough vote", async function () {
-        await expect(voting.connect(addr1).buyVote(2,{value: "200000000000000000"}));//0.2ether
-        await expect(voting.connect(addr1).vote(3,addr1.address)).to.be.revertedWith("You can't vote more votes than you have!");
+        await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
+        await voting.vote(3,addr1, {from: addr1}).should.be.rejectedWith("You can't vote more votes than you have!");
     });
 
     it("Can vote if everything is Ok", async function () {
-        await expect(voting.connect(addr1).createDogProfile("Nancy", "female", "2020-01-02", ["nice"], "I am a dog"));
-        await expect(voting.connect(addr1).buyVote(2,{value: "200000000000000000"}));//0.2ether
-        await expect(voting.connect(addr1).vote(1,addr1.address));
-        expect(await voting.userVoteBalance(addr1.address)).to.equal(1);
+        await voting.createDogProfile("Nancy", "female", "2020-01-02", ["nice"], "I am a dog");
+        await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
+        await voting.vote(1,addr1, {from: addr1})
+        expect(Number(await voting.userVoteBalance(addr1))).to.be.eq(1);
+
         // console.log(await voting.adopt(addr1.address));
-        expect(await (voting.getAdoptDogVote(addr1.address))).to.equal(1);
+        expect(Number(await voting.getAdoptDogVote(addr1))).to.be.eq(1);
     });
 
     it("Only the admin could access this function", async function () {
-        await expect(voting.connect(addr1).endVote()).to.be.revertedWith("only the admin can end vote");
+        await voting.endVote({from: addr1}).should.be.rejectedWith("only the admin can end vote");
     });
 
 
     it("Owner can end the votes if everything is okay", async function () {
-        const beforePurchaseBalance = await voting.connect(owner).getBalance();
-        await expect(voting.connect(addr1).createDogProfile("Nancy", "female", "2020-01-02", ["cute"], "I am a dog"));
-        await expect(voting.connect(addr1).buyVote(2,{value: "200000000000000000"}));//0.2ether
-        await expect(voting.connect(addr1).vote(2,addr1.address));
-        await expect(voting.connect(owner).endVote());
-        const afterPurchaseBalance = await voting.connect(owner).getBalance();
-        await expect(afterPurchaseBalance).to.equal(beforePurchaseBalance);
+        
+        const beforePurchaseBalance = await voting.getBalance({from: owner});
+        await voting.createDogProfile("Nancy", "female", "2020-01-02", ["cute"], "I am a dog");
+        await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
+        await voting.vote(2,addr1, {from: addr1});
+        await voting.endVote({from: owner});
+        const afterPurchaseBalance = await voting.getBalance({from: owner});
+        await expect(Number(afterPurchaseBalance)).to.be.eq(Number(beforePurchaseBalance));
     });
 
     it("After owner end the votes, dogs's vote number should be reset to zero", async function () {
-
-        await expect(voting.connect(addr1).createDogProfile("Nancy", "female", "2020-01-02", ["cute"], "I am a dog"));
-        await expect(voting.connect(addr1).buyVote(2,{value: "200000000000000000"}));//0.2ether
-        await expect(voting.connect(addr1).vote(2,addr1.address));
-        await expect(voting.connect(owner).endVote());
-        expect(await (voting.getAdoptDogVote(addr1.address))).to.equal(0);
+        await voting.createDogProfile("Nancy", "female", "2020-01-02", ["cute"], "I am a dog");
+        await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
+        await voting.vote(2,addr1, {from: addr1});
+        await voting.endVote({from: owner});
+        expect(Number(await voting.getAdoptDogVote(addr1))).to.be.eq(0);
     });
 
 });
