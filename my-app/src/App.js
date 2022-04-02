@@ -5,6 +5,8 @@ import 'antd/dist/antd.css';
 import Icon from './image/icon.webp';
 import React, { useState } from 'react';
 import { UserOutlined, LockOutlined, RightOutlined, CloseOutlined } from '@ant-design/icons';
+// import Web3 from 'web3';
+import Web3 from 'web3/dist/web3.min.js';
 
 const { TabPane } = Tabs;
 
@@ -32,6 +34,8 @@ class App extends React.Component {
   OperationsSlot = () => {
     return {
       left: iconTitle(),
+      right: <Button type="primary" style={{marginRight: 20}} onClick={this.getAccount}>Connect Wallet</Button>,
+
       //right: <Button type="primary" style={{marginRight: 20}} onClick={this.showLogin}>Login / Signup</Button>,
     };
   };
@@ -89,6 +93,16 @@ class App extends React.Component {
         </Button>)}
       </div>
     );
+  }
+  // getAccount= async() => {
+  //   let web3 = new Web3(window.etherum);
+  //   console.log(web3);
+  //   await window.ethereum.send({method: 'eth_requestAccounts'});
+  // }
+  async getAccount() {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const account = accounts[0];
+    console.log(account);
   }
 
   render() {
