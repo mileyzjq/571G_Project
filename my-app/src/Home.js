@@ -6,6 +6,7 @@ import React from 'react';
 import DogForm from './DogForm';
 import dogImage1 from './image/dog1.jpg';
 import dogImage2 from './image/dog2.webp';
+import { getFilesFromPath } from 'web3.storage';
 
 class Home extends React.Component {
   constructor(props) {
@@ -30,7 +31,6 @@ class Home extends React.Component {
   callback = key => {
     console.log(key);
   }
-  
 
   render() {
     const {formVisible} = this.state;
