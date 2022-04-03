@@ -4,7 +4,7 @@ import { Divider, Button, Modal, Skeleton, Avatar, Card, Tabs } from 'antd';
 import DogCard from './DogCard';
 import React from 'react';
 import DogForm from './DogForm';
-import dogImage1 from './image/dog1.jpg';
+import dogImage1 from './image/dog1.jpeg';
 import dogImage2 from './image/dog2.webp';
 import { getFilesFromPath } from 'web3.storage';
 
@@ -34,7 +34,8 @@ class Home extends React.Component {
 
   render() {
     const {formVisible} = this.state;
-
+    const {web3, userAccount, vote} = this.props;
+    
     return (
       <div className="App-setting">
         <div className='title-container'>

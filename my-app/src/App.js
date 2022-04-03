@@ -125,8 +125,7 @@ class App extends React.Component {
         const account = this.state.userAccount;
         console.log("hello " + account);
         let vote = this.state.vote;
-        let vote_number = await vote.methods.getUserVote(account).call().then((result) => {
-          console.log(result)});
+        let vote_number = await vote.methods.getUserVote(account).call();
         console.log("dog vote: " + vote_number);
       } catch (e) {
         console.log('Error, deposit: ', e)
@@ -142,6 +141,7 @@ class App extends React.Component {
   }
   
   handleVoteOk = async() => {
+    console.log("hello");
     console.log(await this.state.web3.eth.getBalance(this.state.contractAccount))
     if(this.state.vote!=='undefined'){
       console.log("value " + this.state.buyVoteNumber);

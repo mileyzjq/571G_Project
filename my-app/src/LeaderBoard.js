@@ -1,7 +1,7 @@
 import { Table, Tag, Space, Button, Avatar, message, Modal, Result } from 'antd';
 import React, { useState } from 'react';
 import './App.css';
-import dogImage from './image/dog1.jpg';
+import dogImage from './image/dog1.jpeg';
 import dogImage2 from './image/dog2.webp';
 import crown from './image/crown.webp';
 

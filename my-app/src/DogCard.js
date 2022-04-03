@@ -14,7 +14,20 @@ const DogCard = () => {
     const [profileVisible, setVisible] = useState(false);
     const [likeColor, setLikeColor] = useState(true);
     const [dislikeColor, setDislikeColor] = useState(true);
-    
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const showModal = () => {
+        setIsModalVisible(true);
+    };
+
+    const handleOk = () => {
+        setIsModalVisible(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
     const changeLikeColor = () => {
         if(dislikeColor) {
             setLikeColor(!likeColor);
@@ -93,6 +106,11 @@ const DogCard = () => {
                 >
                     {content}
                 </Content>
+            </Modal>
+            <Modal title="Basic Modal" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+                <p>Some contents...</p>
+                <p>Some contents...</p>
+                <p>Some contents...</p>
             </Modal>
         </div>   
     );
