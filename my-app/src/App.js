@@ -79,6 +79,7 @@ class App extends React.Component {
       const web3 = new Web3(window.ethereum)
       const netId = await web3.eth.net.getId()
       const accounts = await web3.eth.getAccounts()
+      console.log("netId " + netId);
       //load balance
       if(typeof accounts[0] !=='undefined'){
         const balance = await web3.eth.getBalance(accounts[0])
@@ -140,6 +141,7 @@ class App extends React.Component {
   handleVoteOk = async() => {
     console.log("hello");
     console.log(await this.state.web3.eth.getBalance(this.state.contractAccount))
+    console.log("bank: " + this.state.contractAccount);
     if(this.state.voteContract!=='undefined'){
       console.log("value " + this.state.buyVoteNumber);
       console.log("user account: " + this.state.userAccount);

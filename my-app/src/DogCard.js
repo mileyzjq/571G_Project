@@ -1,7 +1,9 @@
 import { Card, Badge, Avatar, Modal, Row, Typography, message } from 'antd';
 import { EuroCircleOutlined, LikeOutlined, DislikeOutlined, LikeTwoTone, ManOutlined, WomanOutlined, DislikeTwoTone } from '@ant-design/icons';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import dogImage2 from './image/dog2.webp';
+import Web3 from 'web3/dist/web3.min.js';
+import PuppyVote from './abis/PuppyVote.json';
 
 const { Paragraph, Title } = Typography;
 
@@ -9,6 +11,9 @@ const success = () => {
     message.success('Vote Successfully!');
 };
 
+const web3 = new Web3(window.ethereum);
+const netId = 5777;
+const voteContract = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[netId].address);
 
 const DogCard = () => {
     const [profileVisible, setVisible] = useState(false);
@@ -29,6 +34,9 @@ const DogCard = () => {
     };
 
     const changeLikeColor = () => {
+        console.log(web3);
+        //console.log(netId);
+        console.log(voteContract);
         if(dislikeColor) {
             setLikeColor(!likeColor);
         }
