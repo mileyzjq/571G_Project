@@ -30,7 +30,7 @@ const columns = [
     dataIndex: 'avatar',
     key: 'avatar',
     className: "table-replaceColor",
-    render: avatar => <Avatar src={dogImage2} />,
+    render: avatar => <Avatar src={avatar} />,
   },
   {
     title: 'Name',
@@ -99,6 +99,7 @@ const data = [
     gender: 'male',
     votes: 333,
     tags: ['nice', 'lovely'],
+    avatar: dogImage2
   },
   {
     key: '2',
@@ -107,6 +108,7 @@ const data = [
     gender: 'female',
     votes: 222,
     tags: ['lazy'],
+    avatar: dogImage2
   },
   {
     key: '3',
@@ -115,6 +117,7 @@ const data = [
     gender: 'male',
     votes: 111,
     tags: ['cool', 'smart'],
+    avatar: dogImage2
   },
   {
     key: '4',
@@ -123,6 +126,7 @@ const data = [
     gender: 'female',
     votes: 101,
     tags: ['nice', 'pretty'],
+    avatar: dogImage2
   },
   {
     key: '5',
@@ -131,6 +135,7 @@ const data = [
     gender: 'female',
     votes: 50,
     tags: ['naughty'],
+    avatar: dogImage2,
   },
 ];
 

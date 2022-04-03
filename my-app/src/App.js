@@ -28,7 +28,7 @@ class App extends React.Component {
       voteModal: false,
       userAccount: null,
       contractAccount: null,
-      vote: null,
+      voteContract: null,
       web3: null,
       buyVoteNumber: 3,
       voteNumber: 6
@@ -79,8 +79,6 @@ class App extends React.Component {
       const web3 = new Web3(window.ethereum)
       const netId = await web3.eth.net.getId()
       const accounts = await web3.eth.getAccounts()
-      console.log("netid " + netId)
-      console.log("accounts " + accounts)
       //load balance
       if(typeof accounts[0] !=='undefined'){
         const balance = await web3.eth.getBalance(accounts[0])
@@ -96,7 +94,7 @@ class App extends React.Component {
         const vote = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[netId].address)
         console.log(vote)
         const dBankAddress =  PuppyVote.networks[netId].address
-        this.setState({vote: vote, contractAccount: dBankAddress})
+        this.setState({voteContract: vote, contractAccount: dBankAddress})
       } catch (e) {
         console.log('Error', e)
         window.alert('Contracts not deployed to the current network')
@@ -120,12 +118,11 @@ class App extends React.Component {
   }
 
   getVote =async()=> {
-    if(this.state.vote!=='undefined'){
+    if(this.state.voteContract!=='undefined'){
       try{
         const account = this.state.userAccount;
-        console.log("hello " + account);
-        let vote = this.state.vote;
-        let vote_number = await vote.methods.getUserVote(account).call();
+        console.log("hello " + this.state.voteContract);
+        let vote_number = await this.state.voteContract.methods.getUserVote(account).call();
         console.log("dog vote: " + vote_number);
       } catch (e) {
         console.log('Error, deposit: ', e)
@@ -133,7 +130,7 @@ class App extends React.Component {
     }
   }
 
-  onChange(value) {
+  inputNumberChange = (value) => {
     console.log("onchange: " + value);
     this.setState({
       buyVoteNumber: value,
@@ -143,14 +140,13 @@ class App extends React.Component {
   handleVoteOk = async() => {
     console.log("hello");
     console.log(await this.state.web3.eth.getBalance(this.state.contractAccount))
-    if(this.state.vote!=='undefined'){
+    if(this.state.voteContract!=='undefined'){
       console.log("value " + this.state.buyVoteNumber);
       console.log("user account: " + this.state.userAccount);
       const number = this.state.buyVoteNumber;
       const value = number * 10**17;
-      const vote = this.state.vote;
       try{
-        await vote.methods.buyVote(number).send({value: value.toString(), from: this.state.userAccount})
+        await this.state.voteContract.methods.buyVote(number).send({value: value.toString(), from: this.state.userAccount})
       } catch (e) {
         console.log('Error, deposit: ', e)
       }
@@ -208,11 +204,7 @@ class App extends React.Component {
       </div>
     );
   }
-  // getAccount= async() => {
-  //   let web3 = new Web3(window.etherum);
-  //   console.log(web3);
-  //   await window.ethereum.send({method: 'eth_requestAccounts'});
-  // }
+
   async getAccount() {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const account = accounts[0];
@@ -220,14 +212,14 @@ class App extends React.Component {
   }
 
   render() {
-    const {loginVisible, web3, userAccount, vote} = this.state;
+    const {loginVisible, userAccount, voteContract} = this.state;
     
     return (
       <div>
         <Tabs defaultActiveKey="1" onChange={this.callback} tabBarExtraContent={this.OperationsSlot()} tabBarStyle={{backgroundColor: '#f7f7f7'}}>
           <TabPane tab="Home" key="1">
             <div>
-              <Home web3 userAccount vote/>
+              <Home userAccount={userAccount} voteContract={voteContract} />
             </div>
           </TabPane>
           <TabPane tab="LeaderBoard" key="2">
@@ -258,7 +250,7 @@ class App extends React.Component {
         <Modal title="Buy Vote" visible={this.state.voteModal} onOk={this.handleVoteOk} onCancel={this.handleVoteCancel}>
           <p>How many votes do you want to buy? </p>
           <p>Each vote cost 0.1 Ether</p>
-          <InputNumber ref="input" min={1} max={10} onChange={this.onChange} value={this.state.buyVoteNumber}/>
+          <InputNumber min={1} max={10} onChange={this.inputNumberChange} />
         </Modal>
       </div>
     );
