@@ -26,6 +26,12 @@ class App extends React.Component {
     this.state = {
       loginVisible: false,
       voteModal: false,
+      userAccount: null,
+      contractAccount: null,
+      vote: null,
+      web3: null,
+      buyVoteNumber: 3,
+      voteNumber: 6
     };
   }
 
@@ -39,6 +45,7 @@ class App extends React.Component {
       right: <span>
           <Button type="primary" style={{marginRight: 20}} onClick={this.getAccount}>Connect Wallet</Button>
           <Button type="primary" style={{marginRight: 20}} onClick={this.handleShowVote}>Buy Vote</Button>
+          <Button type="primary" style={{marginRight: 20}} onClick={this.getVote}>Vote</Button>
           </span>
     };
   };
@@ -77,7 +84,9 @@ class App extends React.Component {
       //load balance
       if(typeof accounts[0] !=='undefined'){
         const balance = await web3.eth.getBalance(accounts[0])
-        this.setState({account: accounts[0], balance: balance, web3: web3})
+        this.setState({
+          userAccount: accounts[0], balance: balance, web3: web3
+        })
       } else {
         window.alert('Please login with MetaMask')
       }
@@ -87,9 +96,7 @@ class App extends React.Component {
         const vote = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[netId].address)
         console.log(vote)
         const dBankAddress =  PuppyVote.networks[netId].address
-        this.setState({token: vote, dBankAddress: dBankAddress})
-        console.log("token: " + vote)
-        console.log("dBankAddress " + dBankAddress)
+        this.setState({vote: vote, contractAccount: dBankAddress})
       } catch (e) {
         console.log('Error', e)
         window.alert('Contracts not deployed to the current network')
@@ -112,11 +119,42 @@ class App extends React.Component {
     // }
   }
 
+  getVote =async()=> {
+    if(this.state.vote!=='undefined'){
+      try{
+        const account = this.state.userAccount;
+        console.log("hello " + account);
+        let vote = this.state.vote;
+        let vote_number = await vote.methods.getUserVote(account).call().then((result) => {
+          console.log(result)});
+        console.log("dog vote: " + vote_number);
+      } catch (e) {
+        console.log('Error, deposit: ', e)
+      }
+    }
+  }
+
   onChange(value) {
-    console.log('changed', value);
+    console.log("onchange: " + value);
+    this.setState({
+      buyVoteNumber: value,
+    });
   }
   
-  handleVoteOk = () => {
+  handleVoteOk = async() => {
+    console.log(await this.state.web3.eth.getBalance(this.state.contractAccount))
+    if(this.state.vote!=='undefined'){
+      console.log("value " + this.state.buyVoteNumber);
+      console.log("user account: " + this.state.userAccount);
+      const number = this.state.buyVoteNumber;
+      const value = number * 10**17;
+      const vote = this.state.vote;
+      try{
+        await vote.methods.buyVote(number).send({value: value.toString(), from: this.state.userAccount})
+      } catch (e) {
+        console.log('Error, deposit: ', e)
+      }
+    }
     this.setState({
       voteModal: false,
     });
@@ -182,14 +220,14 @@ class App extends React.Component {
   }
 
   render() {
-    const {loginVisible} = this.state;
+    const {loginVisible, web3, userAccount, vote} = this.state;
     
     return (
       <div>
         <Tabs defaultActiveKey="1" onChange={this.callback} tabBarExtraContent={this.OperationsSlot()} tabBarStyle={{backgroundColor: '#f7f7f7'}}>
           <TabPane tab="Home" key="1">
             <div>
-              <Home />
+              <Home web3 userAccount vote/>
             </div>
           </TabPane>
           <TabPane tab="LeaderBoard" key="2">
@@ -220,7 +258,7 @@ class App extends React.Component {
         <Modal title="Buy Vote" visible={this.state.voteModal} onOk={this.handleVoteOk} onCancel={this.handleVoteCancel}>
           <p>How many votes do you want to buy? </p>
           <p>Each vote cost 0.1 Ether</p>
-          <InputNumber min={1} max={10} defaultValue={3} onChange={this.onChange} />
+          <InputNumber ref="input" min={1} max={10} onChange={this.onChange} value={this.state.buyVoteNumber}/>
         </Modal>
       </div>
     );
