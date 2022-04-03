@@ -41,4 +41,5 @@ thumbs.db
 my-app/node_modules/  
 jscoverage_lib/  
 bower_components/  
-dist/  
+dist
+my-app/src/abis/
