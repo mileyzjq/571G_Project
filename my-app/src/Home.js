@@ -4,7 +4,7 @@ import { Divider, Button, Modal, Skeleton, Avatar, Card, Tabs } from 'antd';
 import DogCard from './DogCard';
 import React from 'react';
 import DogForm from './DogForm';
-import dogImage1 from './image/dog1.jpg';
+import dogImage1 from './image/dog1.jpeg';
 import dogImage2 from './image/dog2.webp';
 import { getFilesFromPath } from 'web3.storage';
 
@@ -12,11 +12,14 @@ class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      formVisible: false
+      formVisible: false,
+      voteContract: this.props.voteContract,
     };
   }
 
   showForm = () => {
+    console.log(this.props.userAccount);
+    console.log("home.js - contract: " + this.props.voteContract);
     this.setState({
       formVisible: true,
     });
@@ -34,7 +37,8 @@ class Home extends React.Component {
 
   render() {
     const {formVisible} = this.state;
-
+    const {userAccount, voteContract} = this.props;
+    
     return (
       <div className="App-setting">
         <div className='title-container'>
@@ -48,7 +52,7 @@ class Home extends React.Component {
           onCancel={this.hideForm}
           okText="Submit"
         >
-          <DogForm />
+          <DogForm userAccount={userAccount} voteContract={voteContract}/>
         </Modal>
         <div class="dog-card-container">
           <DogCard class="dog-card-item" image={dogImage2} /> 
