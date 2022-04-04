@@ -16,7 +16,7 @@ contract PuppyVote{
         string[] tags;
         string description;
         // one variable for picture 
-        // string dogPicture;
+        string dogPicture;
     }
 
     mapping(address => Dog) public adopt;   // a user has a dog
@@ -38,10 +38,11 @@ contract PuppyVote{
         _;
     }
 
-    function createDogProfile(string memory _name, string memory _gender, string memory _birthday, string[] memory _tags, string memory _description) public notEmpty (_name){
+    function createDogProfile(string memory _name, string memory _gender, string memory _birthday, string[] memory _tags, string memory _description, string memory _dogPicture) public payable notEmpty (_name){
         //users.push(User(msg.sender)); 
         //get info from web 
-        Dog memory newDog = Dog(msg.sender, 0, _name, _gender, _birthday, _tags, _description);
+        require(msg.value >= votePrice, "Not enough money to create a dog profile"); //transfer to sc addr by default
+        Dog memory newDog = Dog(msg.sender, 0, _name, _gender, _birthday, _tags, _description, _dogPicture);
         adopt[msg.sender] = newDog;
         dogs.push(newDog);
     }
@@ -49,7 +50,7 @@ contract PuppyVote{
     // there should be some input protection in the front end
     function buyVote(uint256 _buyVoteNum) public payable{
         users.push(User(msg.sender));
-        require(msg.value >= _buyVoteNum * votePrice, "Not enough money"); //transfer to sc addr by default
+        require(msg.value >= _buyVoteNum * votePrice, "Not enough money to buy a vote"); //transfer to sc addr by default
         userVoteBalance[msg.sender] += _buyVoteNum;
         //payable(owner).transfer(_buyVoteNum * votePrice);
         // addressshg(this): the address of the smart contract
@@ -121,6 +122,10 @@ contract PuppyVote{
     
     function getDogs() public view returns (Dog[] memory) {
         return dogs;
+    }
+
+    function getDogByIndex(uint index) public view returns(string memory, string memory, string memory, string[] memory, string memory, string memory) {
+        return (dogs[index].puppyName, dogs[index].gender, dogs[index].dateOfBirth, dogs[index].tags, dogs[index].description, dogs[index].dogPicture);
     }
 
     function getLastDogName() public view returns (string memory) {
