@@ -55,11 +55,13 @@ th.table-replaceColor {
 }
 
 .dog-card-container {
+  margin-left: 13%;
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: center;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   align-items: center;
+  align-content: flex-start;
 }
 
 .title-container {

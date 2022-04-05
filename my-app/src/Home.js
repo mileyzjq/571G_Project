@@ -6,7 +6,6 @@ import React from 'react';
 import DogForm from './DogForm';
 import dogImage1 from './image/dog1.jpeg';
 import dogImage2 from './image/dog2.webp';
-import { getFilesFromPath } from 'web3.storage';
 
 class Home extends React.Component {
   constructor(props) {
@@ -14,7 +13,33 @@ class Home extends React.Component {
     this.state = {
       formVisible: false,
       voteContract: this.props.voteContract,
+      userAccount: this.props.userAccount,
+      dogInfo: [],
     };
+  }
+
+  componentDidMount() {
+    this.getDogInfo();
+    //this.createDogElement();
+  }
+
+  getDogInfo = async() => {
+    console.log(this.state.voteContract);
+    const {voteContract, userAccount} = this.props;
+    if(voteContract!=='undefined'){
+      try{
+        const dogs = await voteContract.methods.getDogs().call({from: userAccount});
+        console.log("dog array: " + dogs[0]);
+        console.log("dog array length: " + dogs.length);
+        this.setState({
+          dogInfo: [...dogs],
+        });
+        //setDogsInfo([...dogs]);
+        //getTableData();
+      } catch (e) {
+        console.log('Error, getDog: ', e)
+      }
+    }
   }
 
   showForm = () => {
@@ -34,9 +59,85 @@ class Home extends React.Component {
     console.log(key);
   }
 
+  getAllDogCards = ()=> {
+    const {dogInfo, voteContract} = this.state;
+    const len = dogInfo.length;
+    switch (len) {
+      case 1:
+        return (<div class="dog-card-container"><DogCard class="dog-card-item" dogInfo={dogInfo[0]} voteContract={voteContract}/></div>); 
+      case 2:
+        return (<div class="dog-card-container">
+            <DogCard class="dog-card-item" dogInfo={dogInfo[0]} /> 
+            <DogCard class="dog-card-item" dogInfo={dogInfo[1]} />
+          </div>);
+      case 3:
+        return (<div class="dog-card-container">
+            <DogCard class="dog-card-item" dogInfo={dogImage2} /> 
+            <DogCard class="dog-card-item" dogInfo={dogImage2} /> 
+            <DogCard class="dog-card-item" /> 
+          </div>);
+      case 4:
+        return (<div class="dog-card-container">
+            <DogCard class="dog-card-item" dogInfo={dogImage2} /> 
+            <DogCard class="dog-card-item" dogInfo={dogImage2} /> 
+            <DogCard class="dog-card-item" /> 
+            <DogCard class="dog-card-item" /> 
+          </div>);
+      case 5:    
+        return (<div class="dog-card-container">
+          <DogCard class="dog-card-item" dogInfo={dogImage2} /> 
+          <DogCard class="dog-card-item" dogInfo={dogImage2} /> 
+          <DogCard class="dog-card-item" /> 
+          <DogCard class="dog-card-item" /> 
+          <DogCard class="dog-card-item" /></div>);
+      case 6:    
+        return (<div class="dog-card-container">
+            <DogCard class="dog-card-item" dogInfo={dogImage2} /> 
+            <DogCard class="dog-card-item" dogInfo={dogImage2} /> 
+            <DogCard class="dog-card-item" /> 
+            <DogCard class="dog-card-item" /> 
+            <DogCard class="dog-card-item" /> 
+            <DogCard class="dog-card-item" /></div>);
+      default:
+        break;
+     }
+  }
+
+  // createDogElement =()=> {
+  //   for (var n = 0; n < 2; n++) {  
+  //          //获取div  
+  //           var div = document.getElementById("DvelopmentTarget");  
+  
+  //           //换行  
+  //           var br = document.createElement("br");  
+  //           div.appendChild(br);  
+  
+  //           //添加label ，存放指标名称  
+  //           var div2 = document.createElement("label");  
+  //           div2.innerText = "helllo";  
+  //           div.appendChild(div2);  
+  
+  //           //添加text ，存放指标权重  
+  //           var input = document.createElement("input");  
+  //           input.setAttribute('type', 'text');     
+  //           input.setAttribute('ReadOnly', 'True');  //设置文本为只读类型  
+  //           input.value = 100 
+  //           div.appendChild(input);  
+              
+  //           //添加select 存放指标id  
+  //           var targetID = document.createElement("select");  
+  //           targetID.innerText = 356;  
+  //           targetID.setAttribute('hidden', 'hidden');  
+  //           div.appendChild(targetID);  
+  //           var br = document.createElement("br");  
+  //           div.appendChild(br);   
+  //       }  
+  // }  
+  
+
   render() {
-    const {formVisible, voteContract} = this.state;
-    const {userAccount} = this.props;
+    const {formVisible} = this.state;
+    const {userAccount, voteContract} = this.props;
     
     return (
       <div className="App-setting">
@@ -53,16 +154,7 @@ class Home extends React.Component {
         >
           <DogForm userAccount={userAccount} voteContract={voteContract}/>
         </Modal>
-        <div class="dog-card-container">
-          <DogCard class="dog-card-item" image={dogImage2} /> 
-          <DogCard class="dog-card-item" image={dogImage2} /> 
-          <DogCard class="dog-card-item" /> 
-        </div>
-        <div class="dog-card-container">
-          <DogCard class="dog-card-item" />
-          <DogCard class="dog-card-item"/>
-          <DogCard class="dog-card-item"/>
-        </div>
+        {this.getAllDogCards()}
       </div>
     );
   }

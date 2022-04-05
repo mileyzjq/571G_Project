@@ -119,6 +119,8 @@ class App extends React.Component {
   }
 
   getVote =async()=> {
+    console.log("hello address " + this.state.contractAccount);
+    console.log("contract balance: " + await this.state.web3.eth.getBalance(this.state.contractAccount));
     if(this.state.voteContract!=='undefined'){
       try{
         const account = this.state.userAccount;
@@ -139,12 +141,12 @@ class App extends React.Component {
   }
   
   handleVoteOk = async() => {
-    console.log("hello");
-    console.log(await this.state.web3.eth.getBalance(this.state.contractAccount))
-    console.log("bank: " + this.state.contractAccount);
+    // console.log("hello");
+    console.log("contract balance: " + await this.state.web3.eth.getBalance(this.state.contractAccount));
+    // console.log("bank: " + this.state.contractAccount);
     if(this.state.voteContract!=='undefined'){
-      console.log("value " + this.state.buyVoteNumber);
-      console.log("user account: " + this.state.userAccount);
+      // console.log("value " + this.state.buyVoteNumber);
+      // console.log("user account: " + this.state.userAccount);
       const number = this.state.buyVoteNumber;
       const value = number * 10**17;
       try{
@@ -225,7 +227,7 @@ class App extends React.Component {
             </div>
           </TabPane>
           <TabPane tab="LeaderBoard" key="2">
-              <LeaderBoard />
+              <LeaderBoard userAccount={userAccount} voteContract={voteContract} />
           </TabPane>
         </Tabs>
         <Modal title={null}

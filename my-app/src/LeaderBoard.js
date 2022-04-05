@@ -1,9 +1,10 @@
 import { Table, Tag, Space, Button, Avatar, message, Modal, Result } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import dogImage from './image/dog1.jpeg';
 import dogImage2 from './image/dog2.webp';
 import crown from './image/crown.webp';
+import DogCard from './DogCard';
 
 const success = () => {
     message.success('Vote Successfully!');
@@ -40,9 +41,9 @@ const columns = [
     render: text => <a>{text}</a>,
   },
   {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
+    title: 'Date of Birth',
+    dataIndex: 'dob',
+    key: 'dob',
     className: "table-replaceColor",
   },
   {
@@ -91,63 +92,68 @@ const columns = [
   },
 ];
 
-const data = [
-  {
-    key: '1',
-    name: 'John',
-    age: 2,
-    gender: 'male',
-    votes: 333,
-    tags: ['nice', 'lovely'],
-    avatar: dogImage2
-  },
-  {
-    key: '2',
-    name: 'Jim',
-    age: 3,
-    gender: 'female',
-    votes: 222,
-    tags: ['lazy'],
-    avatar: dogImage2
-  },
-  {
-    key: '3',
-    name: 'Joe',
-    age: 1,
-    gender: 'male',
-    votes: 111,
-    tags: ['cool', 'smart'],
-    avatar: dogImage2
-  },
-  {
-    key: '4',
-    name: 'Sally',
-    age: 1,
-    gender: 'female',
-    votes: 101,
-    tags: ['nice', 'pretty'],
-    avatar: dogImage2
-  },
-  {
-    key: '5',
-    name: 'Nancy',
-    age: 4,
-    gender: 'female',
-    votes: 50,
-    tags: ['naughty'],
-    avatar: dogImage2,
-  },
-];
+const LeaderBoard = (props) => {
+  const {userAccount, voteContract} = props;
+  const [dogsInfo, setDogsInfo] = useState([]);
+  const [tableData, setTableData] = useState([]);
+  const [isInitialized, setIsInitialize] = useState(false);
 
-const LeaderBoard = () => {
+  useEffect(() => {
+    if(!isInitialized) {
+      getDogInfo();
+    }
+    setIsInitialize(true);
+  }, [isInitialized]);
+
+  const getDogInfo = async() => {
+    console.log(voteContract);
+    if(voteContract!=='undefined'){
+      try{
+        const dogs = await voteContract.methods.getDogs().call({from: userAccount});
+        console.log("dog array: " + dogs[0]);
+        console.log("dog array length: " + dogs.length);
+        setDogsInfo([...dogs]);
+        getTableData(dogs);
+      } catch (e) {
+        console.log('Error, getDog: ', e)
+      }
+    }
+  }
+
+  const getTableData = (dogsInfo) => {
+    const len = dogsInfo.length;
+    console.log("table" + len);
+    let list = [];
+    for(let i=0; i<len; i++) {
+      list.push({
+        key: i+1,
+        name: dogsInfo[i][2],
+        dob: dogsInfo[i][4],
+        gender: dogsInfo[i][3],
+        votes: dogsInfo[i][1],
+        tags: dogsInfo[i][5],
+        avatar: dogsInfo[i][7]
+      });
+    }
+    setTableData([...list]);
+  }
+
+  const getDogCardsLine = (list)=> {
+    console.log(1);
+    for(let i=0; i<list.length; i++) {
+      <DogCard />
+    }
+  }
 
   return (
     <div style={{width: "90%", marginLeft: "4%", color: "#f7f7f7", marginTop: "40"}}>
       <Button type="primary" onClick={countDown} style={{marginBottom: 15}}> End Vote </Button>
+      <Button type="primary" onClick={getDogInfo} style={{marginBottom: 15, marginLeft: 15}}> Refresh Table </Button>
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={tableData}
       />
+      {getDogCardsLine([1,3])}
     </div>
   );
 }

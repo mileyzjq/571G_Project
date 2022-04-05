@@ -11,11 +11,12 @@ const success = () => {
     message.success('Vote Successfully!');
 };
 
-const web3 = new Web3(window.ethereum);
-const netId = 5777;
-const voteContract = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[netId].address);
+// const web3 = new Web3(window.ethereum);
+// const netId = 5777;
+// const voteContract = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[netId].address);
 
-const DogCard = () => {
+const DogCard = (props) => {
+    const {dogInfo, voteContract} = props;
     const [profileVisible, setVisible] = useState(false);
     const [likeColor, setLikeColor] = useState(true);
     const [dislikeColor, setDislikeColor] = useState(true);
@@ -34,9 +35,8 @@ const DogCard = () => {
     };
 
     const changeLikeColor = () => {
-        console.log(web3);
         //console.log(netId);
-        console.log(voteContract);
+        console.log(dogInfo);
         if(dislikeColor) {
             setLikeColor(!likeColor);
         }
@@ -77,11 +77,11 @@ const DogCard = () => {
     return (
         <div>
             <Card
-                style={{ width: 300, margin: 12 }}
+                style={{ width: 320, margin: 12 }}
                 cover={
                 <img
                     alt="dog"
-                    src={dogImage2}
+                    src={"https://ipfs.infura.io/ipfs/QmR7BAvmMX3YwHe8RFhfMNPxRFNVHXE8EtK27ZPvxK6SVo"}
                     onClick={()=>setVisible(true)}
                 />
                 }
@@ -101,7 +101,6 @@ const DogCard = () => {
                 visible={profileVisible}
                 onOk={()=>setVisible(false)}
                 onCancel={()=>setVisible(false)}
-                okText="Vote for Pet"
             >
                 <Content
                     extraContent={
