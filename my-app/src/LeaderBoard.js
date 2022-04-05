@@ -5,9 +5,19 @@ import dogImage from './image/dog1.jpeg';
 import dogImage2 from './image/dog2.webp';
 import crown from './image/crown.webp';
 import DogCard from './DogCard';
+import Web3 from 'web3/dist/web3.min.js';
+import PuppyVote from './abis/PuppyVote.json';
+
+const web3 = new Web3(window.ethereum);
+const netId = 5777;
+const voteContract1 = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[netId].address);
 
 const success = () => {
     message.success('Vote Successfully!');
+};
+
+const voteError = () => {
+  message.error('Not enough vote or ether!');
 };
 
 const countDown = () => {
@@ -25,85 +35,116 @@ const countDown = () => {
   }, 6000);
 }
 
-const columns = [
-  {
-    title: 'Avatar',
-    dataIndex: 'avatar',
-    key: 'avatar',
-    className: "table-replaceColor",
-    render: avatar => <Avatar src={avatar} />,
-  },
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-    className: "table-replaceColor",
-    render: text => <a>{text}</a>,
-  },
-  {
-    title: 'Date of Birth',
-    dataIndex: 'dob',
-    key: 'dob',
-    className: "table-replaceColor",
-  },
-  {
-    title: 'Gender',
-    dataIndex: 'gender',
-    key: 'gender',
-    className: "table-replaceColor",
-  },
-  {
-    title: 'Vote Counts',
-    dataIndex: 'votes',
-    key: 'votes',
-    className: "table-replaceColor",
-    render: text => <p style={{color: 'orange'}}>{text}</p>,
-  },
-  {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
-    className: "table-replaceColor",
-    render: tags => (
-      <span>
-        {tags.map(tag => {
-          let color = tag.length > 5 ? 'geekblue' : 'green';
-          if (tag === 'lazy' || tag === 'pretty') {
-            color = 'volcano';
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </span>
-    ),
-  },
-  {
-    title: 'Action',
-    key: 'action',
-    className: "table-replaceColor",
-    render: (text, record) => (
-      <Space size="middle">
-        <Button type="primary" onClick={success}>Vote {record.name}</Button>
-      </Space>
-    ),
-  },
-];
-
 const LeaderBoard = (props) => {
   const {userAccount, voteContract} = props;
   const [dogsInfo, setDogsInfo] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [isInitialized, setIsInitialize] = useState(false);
-
+  const [voteNumber, setVoteNumber] = useState(0);
+  
   useEffect(() => {
     if(!isInitialized) {
       getDogInfo();
+      getVote();
     }
     setIsInitialize(true);
   }, [isInitialized]);
+
+  const columns = [
+    {
+      title: 'Rank',
+      dataIndex: 'rank',
+      key: 'rank',
+      className: "table-replaceColor",
+      render: id => <p>{id}</p>,
+    },
+    {
+      title: 'Avatar',
+      dataIndex: 'avatar',
+      key: 'avatar',
+      className: "table-replaceColor",
+      render: avatar => <Avatar src={avatar} />,
+    },
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      className: "table-replaceColor",
+      render: text => (<a>{text}</a>),
+    },
+    {
+      title: 'Date of Birth',
+      dataIndex: 'dob',
+      key: 'dob',
+      className: "table-replaceColor",
+    },
+    {
+      title: 'Gender',
+      dataIndex: 'gender',
+      key: 'gender',
+      className: "table-replaceColor",
+    },
+    {
+      title: 'Vote Counts',
+      dataIndex: 'votes',
+      key: 'votes',
+      className: "table-replaceColor",
+      render: text => <p style={{color: 'orange'}}>{text}</p>,
+    },
+    {
+      title: 'Tags',
+      key: 'tags',
+      dataIndex: 'tags',
+      className: "table-replaceColor",
+      render: tags => (
+        <span>
+          {tags.map(tag => {
+            let color = tag.length > 5 ? 'geekblue' : 'green';
+            if (tag === 'lazy' || tag === 'pretty') {
+              color = 'volcano';
+            }
+            return (
+              <Tag color={color} key={tag}>
+                {tag.toUpperCase()}
+              </Tag>
+            );
+          })}
+        </span>
+      ),
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      className: "table-replaceColor",
+      render: (text, record) => (
+        <Space size="middle">
+          <Button type="primary" onClick={success}>Vote {record.name}</Button>
+        </Space>
+      ),
+    },
+  ];
+
+  const votePuppy = async(dogOwner) => {
+    if(voteContract!=='undefined'){
+      try{
+        await voteContract.methods.vote(1, dogOwner).send({value: "10000000000",from: userAccount});
+      } catch (e) {
+        console.log('Error, getDog: ', e)
+      }
+    }
+  }
+
+  const getVote = async()=> {
+    if(voteContract!=='undefined'){
+      try{
+        let vote_number = await voteContract.methods.getUserVote(userAccount).call();
+        console.log("dog vote: " + vote_number);
+        setVoteNumber(vote_number);
+      } catch (e) {
+        console.log('Error, vote number: ', e)
+      }
+    }
+  }
 
   const getDogInfo = async() => {
     console.log(voteContract);
@@ -127,22 +168,17 @@ const LeaderBoard = (props) => {
     for(let i=0; i<len; i++) {
       list.push({
         key: i+1,
+        rank: i+1,
         name: dogsInfo[i][2],
         dob: dogsInfo[i][4],
         gender: dogsInfo[i][3],
         votes: dogsInfo[i][1],
         tags: dogsInfo[i][5],
-        avatar: dogsInfo[i][7]
+        avatar: dogsInfo[i][7],
+        owner: dogsInfo[i][0]
       });
     }
     setTableData([...list]);
-  }
-
-  const getDogCardsLine = (list)=> {
-    console.log(1);
-    for(let i=0; i<list.length; i++) {
-      <DogCard />
-    }
   }
 
   return (
@@ -153,7 +189,6 @@ const LeaderBoard = (props) => {
         columns={columns}
         dataSource={tableData}
       />
-      {getDogCardsLine([1,3])}
     </div>
   );
 }

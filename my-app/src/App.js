@@ -35,6 +35,10 @@ class App extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.loadBlockchainData();
+  }
+
   callback = key => {
     console.log(key);
   }
@@ -68,11 +72,7 @@ class App extends React.Component {
     });
   };
 
-  async componentWillMount() {
-    await this.loadBlockchainData(this.props.dispatch)
-  }
-
-  async loadBlockchainData(dispatch) {
+  loadBlockchainData= async() => {
     console.log("hello");
     if(typeof window.ethereum!=='undefined'){
       console.log("ether")
@@ -104,18 +104,6 @@ class App extends React.Component {
     } else {
       window.alert('Please install MetaMask')
     }
-  }
-
-  async getDogInfor() {
-    console.log("get odg info" + this.state.dbank);
-    // if(this.state.dbank!=='undefined'){
-    //   try{
-    //     let dog = await this.state.dbank.methods.getAdoptDog().call()
-    //     console.log("dog " + dog.age)
-    //   } catch (e) {
-    //     console.log('Error, deposit: ', e)
-    //   }
-    // }
   }
 
   getVote =async()=> {

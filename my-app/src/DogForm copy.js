@@ -7,13 +7,11 @@ const { TextArea } = Input;
 const client = create('https://ipfs.infura.io:5001/api/v0');
 
 const DogForm = (props) => {
-  const {web3, userAccount, vote} = this.props;
   const [form] = Form.useForm();
   const [file, setFile] = useState(null);
   const [urlArr, setUrlArr] = useState("");
 
   const retrieveFile = (e) => {
-    console.log("account: " + userAccount);
     const data = e.target.files[0];
     const reader = new window.FileReader();
     reader.readAsArrayBuffer(data);

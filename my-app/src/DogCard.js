@@ -63,6 +63,7 @@ const DogCard = (props) => {
                     <ManOutlined style={{color: 'green', marginRight: 10}} />
                 </div>
                 <p className="icon-container"><font color="orange">2 years old</font></p>
+                <p className="icon-container"><font color="orange">3 votes</font></p>
             </Row>
             <Paragraph>
                 My name is Luck. I am a boy. I am a lovely dog. My name is Luck. I am a boy. I am a lovely dog.

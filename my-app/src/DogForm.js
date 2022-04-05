@@ -36,6 +36,9 @@ class DogForm extends React.Component {
   }
   
   getDog = async() => {
+    const accounts = await web3.eth.getAccounts();
+    const userAccount1 = accounts[0];
+    console.log("account1 ", userAccount1);
     if(this.state.voteContract!=='undefined'){
       try{
         let dogs = await this.state.voteContract.methods.getDogs().call({from: this.state.userAccount});
@@ -83,10 +86,11 @@ class DogForm extends React.Component {
         console.log("tags: " + children);
         console.log("pictures: " + this.state.urlArr);
         console.log("contract-state: " + this.state.voteContract);
-        console.log("contract-props: " + this.props.voteContract);
+        console.log("contract-account: " + this.state.userAccount);
         console.log("contract1: " + voteContract1);
         const {voteContract, puppyName, gender, birthday, tags, description, urlArr, userAccount} = this.state;
         await voteContract1.methods.createDogProfile(puppyName, gender, birthday, tags, description, urlArr).send({value: "100000000000000000", from: userAccount, gas: 1000000})
+        this.props.uploadDogCard();
       } catch (e) {
         console.log('Error, something wrong happened when creating a dog profile: ', e)
       }
