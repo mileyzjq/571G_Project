@@ -16,11 +16,25 @@ const success = () => {
 // const voteContract = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[netId].address);
 
 const DogCard = (props) => {
-    const {dogInfo, voteContract} = props;
+    const {userAccount, dogInfo, voteContract} = props;
+    // const [dogInfo, setDogInfo] = useState([]);
+    const [Data, setData] = useState([]);
     const [profileVisible, setVisible] = useState(false);
     const [likeColor, setLikeColor] = useState(true);
     const [dislikeColor, setDislikeColor] = useState(true);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isInitialized, setIsInitialize] = useState(false);
+
+    useEffect(() => {
+        if(!isInitialized) {
+            getData([...dogInfo]);
+            console.log("dogInfo[dogInfo.length - 1][2]： " + dogInfo[dogInfo.length - 1][2]);
+            console.log("dogInfo： " + dogInfo);
+            console.log("dogInfo[dogInfo.length - 1]： " + dogInfo[dogInfo.length - 1]);
+            console.log("dogInfo.length： " + dogInfo.length);
+        }
+        setIsInitialize(true);
+      }, [isInitialized]);
 
     const showModal = () => {
         setIsModalVisible(true);
@@ -55,34 +69,56 @@ const DogCard = (props) => {
         </Row>
     );
 
+    const getData = ([...dogInfo]) => {
+        console.log("dogInfo: " + dogInfo);
+        const len = dogInfo.length;
+        console.log("dog-length: " + len);
+        let list = [];
+          list.push({
+            key: len - 1,
+            owner: dogInfo[len - 1][0],
+            votes: dogInfo[len - 1][1],
+            name: dogInfo[len - 1][2],
+            gender: dogInfo[len - 1][3],
+            dob: dogInfo[len - 1][4],
+            tags: dogInfo[len - 1][5],
+            description: dogInfo[len - 1][6],
+            avatar: dogInfo[len - 1][7],
+          });
+        setData([...list]);
+      }
+
     const content = (
         <div>
-            <Title level={2} style={{color: '#1890ff'}}>Luck</Title>
+            <Title level={2} style={{color: '#1890ff'}}>{dogInfo[2]}</Title>
             <Row>
                 <div className="icon-container">
                     <ManOutlined style={{color: 'green', marginRight: 10}} />
                 </div>
-                <p className="icon-container"><font color="orange">2 years old</font></p>
-                <p className="icon-container"><font color="orange">3 votes</font></p>
+                
+                <p className="icon-container"><font color="orange">{dogInfo[4]}</font></p>
+                <p className="icon-container"><font color="orange">{dogInfo[1]} vote(s)</font></p>
             </Row>
             <Paragraph>
-                My name is Luck. I am a boy. I am a lovely dog. My name is Luck. I am a boy. I am a lovely dog.
-                My name is Luck. I am a boy. I am a lovely dog. 
+                   {dogInfo[6]} 
             </Paragraph>
             <Paragraph>
-                My name is Luck. I am a boy. I am a lovely dog. I am a lovely dog. 
+                I am a lovely dog. Please vote for me. 
             </Paragraph>
         </div>
     );
 
+    
+
     return (
+        
         <div>
             <Card
                 style={{ width: 320, margin: 12 }}
                 cover={
                 <img
                     alt="dog"
-                    src={"https://ipfs.infura.io/ipfs/QmR7BAvmMX3YwHe8RFhfMNPxRFNVHXE8EtK27ZPvxK6SVo"}
+                    src={dogInfo[7]}
                     onClick={()=>setVisible(true)}
                 />
                 }
@@ -107,7 +143,7 @@ const DogCard = (props) => {
                     extraContent={
                         <Avatar
                             size='large' 
-                            src={dogImage2} 
+                            src={dogInfo[7]} 
                             style={{height: 80, width: 80, display: 'flex', marginBottom: 0}}
                         />
                     }
