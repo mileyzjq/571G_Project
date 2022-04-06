@@ -1,9 +1,10 @@
 import { Card, Badge, Avatar, Modal, Row, Typography, message } from 'antd';
 import { EuroCircleOutlined, LikeOutlined, DislikeOutlined, LikeTwoTone, ManOutlined, WomanOutlined, DislikeTwoTone } from '@ant-design/icons';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import dogImage2 from './image/dog2.webp';
 import Web3 from 'web3/dist/web3.min.js';
 import PuppyVote from './abis/PuppyVote.json';
+import { render } from '@testing-library/react';
 
 const { Paragraph, Title } = Typography;
 
@@ -11,14 +12,17 @@ const success = () => {
     message.success('Vote Successfully!');
 };
 
-// const web3 = new Web3(window.ethereum);
-// const netId = 5777;
-// const voteContract = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[netId].address);
+const  voteError = () => {
+    message.error('Not enough vote or ether!');
+  };
+
+const web3 = new Web3(window.ethereum);
+const netId = 5777;
+const voteContract = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[netId].address);
+
 
 const DogCard = (props) => {
-    const {userAccount, dogInfo, voteContract} = props;
-    // const [dogInfo, setDogInfo] = useState([]);
-    const [Data, setData] = useState([]);
+    const {userAccount, dogInfo} = props;
     const [profileVisible, setVisible] = useState(false);
     const [likeColor, setLikeColor] = useState(true);
     const [dislikeColor, setDislikeColor] = useState(true);
@@ -27,7 +31,8 @@ const DogCard = (props) => {
 
     useEffect(() => {
         if(!isInitialized) {
-            getData([...dogInfo]);
+            console.log("userAccount: " + userAccount);
+            console.log("gender: " + dogInfo[3]);
             console.log("dogInfo[dogInfo.length - 1][2]： " + dogInfo[dogInfo.length - 1][2]);
             console.log("dogInfo： " + dogInfo);
             console.log("dogInfo[dogInfo.length - 1]： " + dogInfo[dogInfo.length - 1]);
@@ -68,24 +73,30 @@ const DogCard = (props) => {
           <div style={{ flex: 1, marginLeft: 30}}>{children}</div>
         </Row>
     );
-
-    const getData = ([...dogInfo]) => {
-        console.log("dogInfo: " + dogInfo);
-        const len = dogInfo.length;
-        console.log("dog-length: " + len);
-        let list = [];
-          list.push({
-            key: len - 1,
-            owner: dogInfo[len - 1][0],
-            votes: dogInfo[len - 1][1],
-            name: dogInfo[len - 1][2],
-            gender: dogInfo[len - 1][3],
-            dob: dogInfo[len - 1][4],
-            tags: dogInfo[len - 1][5],
-            description: dogInfo[len - 1][6],
-            avatar: dogInfo[len - 1][7],
-          });
-        setData([...list]);
+    
+    const  votePuppy = async(dogOwner, dogName) => {
+        // const {userAccount, voteContract} = this.props;
+        console.log("voteContract: "+voteContract);
+        // console.log("dogOwner: " + dogOwner);
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const account = accounts[0];
+        console.log("account: "+account);
+        let voteNumber = await voteContract.methods.getUserVote(account).call();
+        console.log("voteNumber: ", voteNumber);
+        if(voteNumber < 1) {
+          console.log("User's vote number is not enough", voteNumber);
+          voteError();
+          return;
+        }
+        if(voteContract!=='undefined'){
+          console.log("owner: ", dogOwner);
+          try{
+            await voteContract.methods.vote(1, dogName, dogOwner).send({from: account});
+            success();
+          } catch (e) {
+            console.log('Error, getDog: ', e)
+          }
+        }
       }
 
     const content = (
@@ -93,7 +104,8 @@ const DogCard = (props) => {
             <Title level={2} style={{color: '#1890ff'}}>{dogInfo[2]}</Title>
             <Row>
                 <div className="icon-container">
-                    <ManOutlined style={{color: 'green', marginRight: 10}} />
+                {dogInfo[3] === "male" ? <ManOutlined style={{color: 'green', marginRight: 10}} /> : <WomanOutlined style={{color: 'red', marginRight: 10}}/> }
+
                 </div>
                 
                 <p className="icon-container"><font color="orange">{dogInfo[4]}</font></p>
@@ -107,9 +119,6 @@ const DogCard = (props) => {
             </Paragraph>
         </div>
     );
-
-    
-
     return (
         
         <div>
@@ -123,7 +132,8 @@ const DogCard = (props) => {
                 />
                 }
                 actions={[
-                <EuroCircleOutlined key="dog-vote" onClick={success} />,
+                    
+                <EuroCircleOutlined key="dog-vote" onClick={()=>votePuppy(dogInfo[0], dogInfo[2])} />,
                 <div onClick={changeLikeColor}>
                     {likeColor ? <LikeOutlined /> : <LikeTwoTone key="dog-like" twoToneColor="red" style={{fontSize: 20}}/> }
                 </div>,
