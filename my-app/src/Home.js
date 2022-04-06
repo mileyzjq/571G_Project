@@ -18,7 +18,6 @@ class Home extends React.Component {
     super(props);
     this.state = {
       formVisible: false,
-      voteContract: this.props.voteContract,
       userAccount: this.props.userAccount,
       dogInfo: [],
     };
@@ -31,9 +30,10 @@ class Home extends React.Component {
 
   getDogInfo = async() => {
     console.log(this.state.voteContract);
-    const {voteContract, userAccount} = this.props;
+    const {userAccount} = this.props;
     if(voteContract1!=='undefined'){
       try{
+        console.log(userAccount);
         const dogs = await voteContract1.methods.getDogs().call({from: userAccount});
         console.log("dog array: " + dogs[0]);
         console.log("dog array length: " + dogs.length);
@@ -69,7 +69,7 @@ class Home extends React.Component {
     const {dogInfo, voteContract} = this.state;
     return (<div class="dog-card-container">
       {
-        dogInfo.map(dog => {return (<DogCard class="dog-card-item" dogInfo={dog} voteContract={voteContract}/>)})
+        dogInfo.map(dog => {return (<DogCard class="dog-card-item" dogInfo={[...dog]} voteContract={voteContract}/>)})
       }
     </div>);
   }
@@ -93,7 +93,6 @@ class Home extends React.Component {
           visible={formVisible}
           onOk={this.hideForm}
           onCancel={this.hideForm}
-          okText="Submit"
         >
           <DogForm userAccount={userAccount} voteContract={voteContract} uploadDogCard={this.uploadDogCard}/>
         </Modal>

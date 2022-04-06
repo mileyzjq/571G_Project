@@ -20,28 +20,13 @@ const voteError = () => {
   message.error('Not enough vote or ether!');
 };
 
-const countDown = () => {
-  const modal = Modal.success({
-    title: 'End Vote successfully',
-    width: "36%",
-    content: (<Result
-      icon={<div><img src={crown} alt="crown" style={{marginTop: -50, width: 200, height: 200}}/> <Avatar src={dogImage2} style={{width: 160, height: 160, marginTop: -78}} /></div>}
-      title="Congratulations! John won $20!"
-    />),
-    footer: null
-  });
-  setTimeout(() => {
-    modal.destroy();
-  }, 6000);
-}
-
 const LeaderBoard = (props) => {
-  const {userAccount, voteContract} = props;
+  const {userAccount, voteContract, contractAccount} = props;
   const [dogsInfo, setDogsInfo] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [isInitialized, setIsInitialize] = useState(false);
   const [voteNumber, setVoteNumber] = useState(0);
-  
+
   useEffect(() => {
     if(!isInitialized) {
       getDogInfo();
@@ -118,16 +103,43 @@ const LeaderBoard = (props) => {
       className: "table-replaceColor",
       render: (text, record) => (
         <Space size="middle">
-          <Button type="primary" onClick={success}>Vote {record.name}</Button>
+          <Button type="primary" onClick={()=>votePuppy(record.owner, record.name)}>Vote {record.name}</Button>
         </Space>
       ),
     },
   ];
 
-  const votePuppy = async(dogOwner) => {
+  const countDown = () => {
+    endVote();
+    const modal = Modal.success({
+      title: 'End Vote successfully',
+      width: 460,
+      content: (<Result
+        icon={<div><img src={crown} alt="crown" style={{marginTop: -50, width: 200, height: 200}}/>
+        <Avatar src={tableData[0].avatar} style={{width: 160, height: 160, marginTop: -78}} /></div>}
+        title= {"Congratulations! " + tableData[0].name + " wins the competition!"}
+      />),
+      footer: null
+    });
+    setTimeout(() => {
+      modal.destroy();
+    }, 6000);
+  }
+
+  const votePuppy = async(dogOwner, dogName) => {
+    let voteNumber = await voteContract.methods.getUserVote(userAccount).call();
+    console.log("hello: ", voteNumber);
+    if(voteNumber < 1) {
+      console.log("hello: ", voteNumber);
+      voteError();
+      return;
+    }
     if(voteContract!=='undefined'){
+      console.log("owner: ", dogOwner);
       try{
-        await voteContract.methods.vote(1, dogOwner).send({value: "10000000000",from: userAccount});
+        await voteContract.methods.vote(1, dogName, dogOwner).send({from: userAccount});
+        success();
+        getDogInfo();
       } catch (e) {
         console.log('Error, getDog: ', e)
       }
@@ -146,12 +158,24 @@ const LeaderBoard = (props) => {
     }
   }
 
+  const endVote = async()=> {
+    if(voteContract!=='undefined'){
+      console.log("dbank: ", contractAccount);
+      try{
+        await voteContract.methods.endVote().send({value: "1000000000000000", to:tableData[0].owner});
+      } catch (e) {
+        console.log('Error, end vote: ', e)
+      }
+    }
+  }
+
   const getDogInfo = async() => {
     console.log(voteContract);
     if(voteContract!=='undefined'){
       try{
         const dogs = await voteContract.methods.getDogs().call({from: userAccount});
         console.log("dog array: " + dogs[0]);
+        console.log("dog array: " + dogs[1]);
         console.log("dog array length: " + dogs.length);
         setDogsInfo([...dogs]);
         getTableData(dogs);

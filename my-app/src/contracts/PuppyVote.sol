@@ -18,11 +18,6 @@ contract PuppyVote{
         string dogPicture;
     }
 
-    event Approval(
-        address indexed _owner,
-        address indexed _dogOwner
-    );
-
     mapping(address => Dog) public adopt;   // a user has a dog
     mapping(address => uint256) public userVoteBalance;// the number of votes user has confirmed
     
@@ -78,12 +73,17 @@ contract PuppyVote{
     //     return true;
     // }
 
-    function vote(uint256 _voteNum, address dogOwner) public{
+    function vote(uint256 _voteNum, string memory _dogName, address dogOwner) public{
         require(_voteNum <= userVoteBalance[msg.sender], "You can't vote more votes than you have!");
         userVoteBalance[msg.sender] -= _voteNum;
         adopt[dogOwner].numVote += _voteNum;//update dog's vote
+        uint256 l = dogs.length;
+        for (uint i = 0; i < l; i++) {
+            if(dogs[i].ownerAddress == dogOwner && keccak256(bytes(dogs[i].puppyName)) == keccak256(bytes(_dogName))) {
+                dogs[i].numVote += _voteNum;
+            }
+        }
         rank();//update leader board
-        emit Approval(owner, dogOwner);
     }
 
     // calculate the winner, and return money to the winner

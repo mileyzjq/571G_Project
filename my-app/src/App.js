@@ -133,8 +133,8 @@ class App extends React.Component {
     console.log("contract balance: " + await this.state.web3.eth.getBalance(this.state.contractAccount));
     // console.log("bank: " + this.state.contractAccount);
     if(this.state.voteContract!=='undefined'){
-      // console.log("value " + this.state.buyVoteNumber);
-      // console.log("user account: " + this.state.userAccount);
+      console.log("value " + this.state.buyVoteNumber);
+      console.log("user account: " + this.state.userAccount);
       const number = this.state.buyVoteNumber;
       const value = number * 10**17;
       try{
@@ -197,25 +197,29 @@ class App extends React.Component {
     );
   }
 
-  async getAccount() {
+  getAccount =async()=> {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const account = accounts[0];
+    this.setState({
+      userAccount: account,
+    });
     console.log(account);
+    this.loadBlockchainData();
   }
 
   render() {
-    const {loginVisible, userAccount, voteContract} = this.state;
+    const {loginVisible, userAccount, voteContract, contractAccount} = this.state;
     
     return (
       <div>
         <Tabs defaultActiveKey="1" onChange={this.callback} tabBarExtraContent={this.OperationsSlot()} tabBarStyle={{backgroundColor: '#f7f7f7'}}>
           <TabPane tab="Home" key="1">
             <div>
-              <Home userAccount={userAccount} voteContract={voteContract} />
+              <Home voteContract={voteContract} />
             </div>
           </TabPane>
           <TabPane tab="LeaderBoard" key="2">
-              <LeaderBoard userAccount={userAccount} voteContract={voteContract} />
+              <LeaderBoard userAccount={userAccount} voteContract={voteContract} contractAccount={contractAccount} />
           </TabPane>
         </Tabs>
         <Modal title={null}

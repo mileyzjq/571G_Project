@@ -52,13 +52,13 @@ contract("PuppyVote", (accounts) => {
 
     it("Can not vote if not enough vote", async function () {
         await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
-        await voting.vote(3,addr1, {from: addr1}).should.be.rejectedWith("You can't vote more votes than you have!");
+        await voting.vote(3, "", addr1, {from: addr1}).should.be.rejectedWith("You can't vote more votes than you have!");
     });
 
     it("Can vote if everything is Ok", async function () {
         await voting.createDogProfile("Nancy", "female", "2020-01-02", ["nice"], "I am a dog", "https://ipfs.infura.io/ipfs/QmR74ePYb4b231PWwAEs3RkHz5erfCgoVYZfnXAFgWcPrQ", {value: "100000000000000000"});
         await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
-        await voting.vote(1,addr1, {from: addr1})
+        await voting.vote(1, "Nancy", addr1, {from: addr1})
         expect(Number(await voting.userVoteBalance(addr1))).to.be.eq(1);
 
         // console.log(await voting.adopt(addr1.address));
@@ -75,7 +75,7 @@ contract("PuppyVote", (accounts) => {
         const beforePurchaseBalance = await voting.getBalance({from: owner});
         await voting.createDogProfile("Nancy", "female", "2020-01-02", ["cute"], "I am a dog", "https://ipfs.infura.io/ipfs/QmR74ePYb4b231PWwAEs3RkHz5erfCgoVYZfnXAFgWcPrQ", {value: "100000000000000000"});
         await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
-        await voting.vote(2,addr1, {from: addr1});
+        await voting.vote(2, "Nancy", addr1, {from: addr1});
         await voting.endVote({from: owner});
         const afterPurchaseBalance = await voting.getBalance({from: owner});
         await expect(Number(afterPurchaseBalance)).to.be.eq(Number(beforePurchaseBalance));
@@ -84,7 +84,7 @@ contract("PuppyVote", (accounts) => {
     it("After owner end the votes, dogs's vote number should be reset to zero", async function () {
         await voting.createDogProfile("Nancy", "female", "2020-01-02", ["cute"], "I am a dog", "https://ipfs.infura.io/ipfs/QmR74ePYb4b231PWwAEs3RkHz5erfCgoVYZfnXAFgWcPrQ", {value: "100000000000000000"});
         await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
-        await voting.vote(2,addr1, {from: addr1});
+        await voting.vote(2, "Nancy", addr1, {from: addr1});
         await voting.endVote({from: owner});
         expect(Number(await voting.getAdoptDogVote(addr1))).to.be.eq(0);
     });

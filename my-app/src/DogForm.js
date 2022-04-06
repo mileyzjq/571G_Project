@@ -88,8 +88,11 @@ class DogForm extends React.Component {
         console.log("contract-state: " + this.state.voteContract);
         console.log("contract-account: " + this.state.userAccount);
         console.log("contract1: " + voteContract1);
+        const accounts = await web3.eth.getAccounts();
+        const userAccount1 = accounts[0];
+        console.log(userAccount1);
         const {voteContract, puppyName, gender, birthday, tags, description, urlArr, userAccount} = this.state;
-        await voteContract1.methods.createDogProfile(puppyName, gender, birthday, tags, description, urlArr).send({value: "100000000000000000", from: userAccount, gas: 1000000})
+        await voteContract1.methods.createDogProfile(puppyName, gender, birthday, tags, description, urlArr).send({value: "100000000000000000", from: userAccount1})
         this.props.uploadDogCard();
       } catch (e) {
         console.log('Error, something wrong happened when creating a dog profile: ', e)
