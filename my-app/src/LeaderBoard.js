@@ -26,6 +26,7 @@ const LeaderBoard = (props) => {
   const [tableData, setTableData] = useState([]);
   const [isInitialized, setIsInitialize] = useState(false);
   const [voteNumber, setVoteNumber] = useState(0);
+  const [admin, setAdmin] = useState("");
 
   useEffect(() => {
     if(!isInitialized) {
@@ -137,7 +138,9 @@ const LeaderBoard = (props) => {
     if(voteContract!=='undefined'){
       console.log("owner: ", dogOwner);
       try{
-        await voteContract.methods.vote(1, dogName, dogOwner).send({from: userAccount});
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const account = accounts[0];
+        await voteContract.methods.vote(1, dogName, dogOwner).send({from: account});
         success();
         getDogInfo();
       } catch (e) {
@@ -149,7 +152,7 @@ const LeaderBoard = (props) => {
   const getVote = async()=> {
     if(voteContract!=='undefined'){
       try{
-        let vote_number = await voteContract.methods.getUserVote(userAccount).call();
+        let vote_number = await voteContract1.methods.getUserVote(userAccount).call();
         console.log("dog vote: " + vote_number);
         setVoteNumber(vote_number);
       } catch (e) {
@@ -162,7 +165,9 @@ const LeaderBoard = (props) => {
     if(voteContract!=='undefined'){
       console.log("dbank: ", contractAccount);
       try{
-        await voteContract.methods.endVote().send({value: "1000000000000000", to:tableData[0].owner});
+        let admin = await voteContract.methods.getAdmin().call();
+        console.log("admin " + admin);
+        await voteContract.methods.endVote().send({from: admin});
       } catch (e) {
         console.log('Error, end vote: ', e)
       }
