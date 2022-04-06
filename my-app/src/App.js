@@ -107,14 +107,16 @@ class App extends React.Component {
   }
 
   getVote =async()=> {
-    console.log("hello address " + this.state.contractAccount);
+    console.log("contract address " + this.state.contractAccount);
     console.log("contract balance: " + await this.state.web3.eth.getBalance(this.state.contractAccount));
     if(this.state.voteContract!=='undefined'){
       try{
         const account = this.state.userAccount;
         console.log("hello " + this.state.voteContract);
         let vote_number = await this.state.voteContract.methods.getUserVote(account).call();
+        let admin = await this.state.voteContract.methods.getAdmin().call();
         console.log("dog vote: " + vote_number);
+        console.log("admin: " + admin);
       } catch (e) {
         console.log('Error, deposit: ', e)
       }

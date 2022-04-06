@@ -154,4 +154,8 @@ contract PuppyVote{
     function getBalance() public view returns (uint) {
         return address(this).balance;
     }
+
+    function getAdmin() public view returns (address admin) {
+        return owner;
+    }
 }
