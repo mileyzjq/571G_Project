@@ -25,7 +25,7 @@ const endVoteError = () => {
 };
 
 const LeaderBoard = (props) => {
-  const {userAccount, contractAccount} = props;
+  const {userAccount} = props;
   const [dogsInfo, setDogsInfo] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [isInitialized, setIsInitialize] = useState(false);

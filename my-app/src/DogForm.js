@@ -16,149 +16,130 @@ const items = ["nice", "lovely", "cool", "smart", "loser", "cute", "pretty", "na
 const children = []
 items.forEach((v, i) => children.push(<Option key={v}>{v}</Option>));
 
-class DogForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      voteModal: false,
-      formVisible: false,
-      urlArr: "",
-      file: null,
-      owner: "",
-      puppyName: "",
-      gender: "",
-      birthday: "",
-      description: "",
-      tags:[],
-    };
-  }
+const DogForm = (props) => {
+  const {uploadDogCard} = props;
+  const [form] = Form.useForm();
+  const [file, setFile] = useState(null);
+  const [urlArr, setUrlArr] = useState("");
+  const [puppyName, setPuppyName] = useState("");
+  const [gender, setGender] = useState("");
+  const [birthday, setBirthday] = useState("");
+  const [description, setDescription] = useState("");
+  const [tags, setTags] = useState([]);
 
-  retrieveFile = (e) => {
+  const retrieveFile = (e) => {
     const data = e.target.files[0];
     const reader = new window.FileReader();
     reader.readAsArrayBuffer(data);
     reader.onloadend = () => {
-      this.setState({
-        file: reader.result,
-      });
+      setFile((reader.result));
     }
+    console.log(reader.result);
     e.preventDefault();  
   }
 
-  handleSubmit = async (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       console.log("miley");
-      const created = await client.add(this.state.file);
+      const created = await client.add(file);
       const url = `https://ipfs.infura.io/ipfs/${created.path}`;
-      this.setState({
-        urlArr: url,
-      });
-      console.log("url: " + this.state.urlArr);     
+      setUrlArr(url); 
+      console.log("url: " + urlArr);     
     } catch (error) {
       console.log(error.message);
     }
   };
 
-  profileSubmit = async() => {
+  const profileSubmit = async() => {
     console.log("submit");
-    if(this.state.voteContract!=='undefined'){
+    if(voteContract!=='undefined'){
       try{
         const accounts = await web3.eth.getAccounts();
         const userAccount1 = accounts[0];
         console.log(userAccount1);
-        const {puppyName, gender, birthday, tags, description, urlArr} = this.state;
+        console.log(tags);
+        console.log(puppyName);
+        console.log(birthday);
+        console.log(description);
+        console.log(urlArr);
         await voteContract.methods.createDogProfile(puppyName, gender, birthday, tags, description, urlArr).send({value: "100000000000000000", from: userAccount1})
-        this.props.uploadDogCard();
+        props.uploadDogCard();
       } catch (e) {
         console.log('Error, something wrong happened when creating a dog profile: ', e)
       }
     }
-    this.setState({
-      voteModal: false,
-    });
   };
 
-  handleSelectChange =(value)=> {
+  const handleSelectChange =(value)=> {
     console.log(`Selected: ${value}`);
     const list = String(value).split(",", 3);
-    this.setState({
-      tags: list,
-    });
+    setTags([...list]);
   } 
 
-  puppyNameChange =(e)=> {
+  const puppyNameChange =(e)=> {
     console.log("puppyName: " + e.target.value);
-    this.setState({
-      puppyName: e.target.value,
-    });
+    setPuppyName(e.target.value);
   }
 
-  genderChange =(e)=> {
+  const genderChange =(e)=> {
     console.log("gender: " + e.target.value);
-    this.setState({
-      gender: e.target.value,
-    });
+    setGender("e.target.value");
   }
 
-  birthdayChange =(moment, string)=> {
-    // console.log("dateString: " + moment);
+  const birthdayChange =(moment, string)=> {
     console.log("birthday: " + string);
-    this.setState({
-      birthday: string,
-    });
+    setBirthday(string);
   }
 
-  descriptionChange =(e)=> {
+  const descriptionChange =(e)=> {
     console.log("description: " + e.target.value);
-    this.setState({
-      description: e.target.value,
-    });
+    setDescription(e.target.value);
   }
 
-  render() {
-    return (
-      <div>
-        <Form
-            labelCol={{ span: 6 }}
-            wrapperCol={{ span: 16 }}
-            layout="horizontal"
-          >
-            <Form.Item label="Puppy Name">
-                <Input onChange={this.puppyNameChange}/>
-            </Form.Item>
-            <Form.Item label="Gender" name="gender">
-                <Radio.Group>
-                <Radio.Button value="male" onChange={this.genderChange}>Male</Radio.Button>
-                <Radio.Button value="Female" onChange={this.genderChange}>Female</Radio.Button>
-                </Radio.Group>
-            </Form.Item>
-            <Form.Item label="Date of Birth">
-                <DatePicker onChange={this.birthdayChange}/>
-            </Form.Item>
-            <Form.Item label="Tags">
-              <Select
-                mode="multiple"
-                size="default"
-                placeholder="Please select"
-                onChange={this.handleSelectChange}
-                style={{ width: '100%' }}
-              >
-                {children}
-              </Select>
-            </Form.Item>
-            <Form.Item label="Description">
-                <TextArea rows={5} showCount maxLength={300} onChange={this.descriptionChange} />
-            </Form.Item>
-        </Form>
-        <form className="form" onSubmit={this.handleSubmit} style={{marginLeft: 10, marginTop: 10}}>
-            <input type="file" name="data" onChange={this.retrieveFile} />
-            <button type="submit" className="btn" >Upload file</button>
-        </form>
-        <Button type="primary" style={{marginTop: 20, marginLeft: 10}} onClick={this.profileSubmit}>Submit</Button>
-      </div>  
-    );
-  }
+  return (
+    <div>
+      <Form
+          form={form}
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 16 }}
+          layout="horizontal"
+        >
+          <Form.Item label="Puppy Name">
+              <Input onChange={puppyNameChange}/>
+          </Form.Item>
+          <Form.Item label="Gender" name="gender">
+              <Radio.Group onChange={genderChange}>
+                <Radio.Button value="male">Male</Radio.Button>
+                <Radio.Button value="Female">Female</Radio.Button>
+              </Radio.Group>
+          </Form.Item>
+          <Form.Item label="Date of Birth">
+              <DatePicker onChange={birthdayChange}/>
+          </Form.Item>
+          <Form.Item label="Tags">
+            <Select
+              mode="multiple"
+              size="default"
+              placeholder="Please select"
+              onChange={handleSelectChange}
+              style={{ width: '100%' }}
+            >
+              {children}
+            </Select>
+          </Form.Item>
+          <Form.Item label="Description">
+              <TextArea rows={5} showCount maxLength={300} onChange={descriptionChange} />
+          </Form.Item>
+      </Form>
+      <form className="form" onSubmit={handleSubmit} style={{marginLeft: 10, marginTop: 10}}>
+          <input type="file" name="data" onChange={retrieveFile} />
+          <button type="submit" className="btn" >Upload file</button>
+      </form>
+      <Button type="primary" style={{marginTop: 20, marginLeft: 10}} onClick={profileSubmit}>Submit</Button>
+    </div>  
+  );
 };
 
 export default DogForm;
