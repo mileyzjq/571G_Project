@@ -4,8 +4,6 @@ import { Divider, Button, Modal, Skeleton, Avatar, Card, Tabs } from 'antd';
 import DogCard from './DogCard';
 import React from 'react';
 import DogForm from './DogForm';
-import dogImage1 from './image/dog1.jpeg';
-import dogImage2 from './image/dog2.webp';
 import Web3 from 'web3/dist/web3.min.js';
 import PuppyVote from './abis/PuppyVote.json';
 
@@ -18,23 +16,19 @@ class Home extends React.Component {
     super(props);
     this.state = {
       formVisible: false,
-      userAccount: this.props.userAccount,
       dogInfo: [],
     };
   }
 
   componentDidMount() {
     this.getDogInfo();
-    //this.createDogElement();
   }
 
   getDogInfo = async() => {
     console.log(this.state.voteContract);
-    const {userAccount} = this.props;
     if(voteContract1!=='undefined'){
       try{
-        console.log(userAccount);
-        const dogs = await voteContract1.methods.getDogs().call({from: userAccount});
+        const dogs = await voteContract1.methods.getDogs().call();
         console.log("dog array: " + dogs[0]);
         console.log("dog array length: " + dogs.length);
         this.setState({
@@ -49,7 +43,6 @@ class Home extends React.Component {
   }
 
   showForm = () => {
-    console.log(this.props.userAccount);
     this.setState({
       formVisible: true,
     });
@@ -80,7 +73,7 @@ class Home extends React.Component {
 
   render() {
     const {formVisible} = this.state;
-    const {userAccount, voteContract} = this.props;
+    const {userAccount} = this.props;
     
     return (
       <div className="App-setting">
@@ -94,7 +87,7 @@ class Home extends React.Component {
           onOk={this.hideForm}
           onCancel={this.hideForm}
         >
-          <DogForm userAccount={userAccount} voteContract={voteContract} uploadDogCard={this.uploadDogCard}/>
+          <DogForm userAccount={userAccount} uploadDogCard={this.uploadDogCard}/>
         </Modal>
         {this.getDogLines()}
       </div>

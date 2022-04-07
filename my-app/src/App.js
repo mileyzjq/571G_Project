@@ -1,4 +1,4 @@
-import { Tabs, Button, Avatar, Modal, Input, Divider, Card, InputNumber } from 'antd';
+import { Tabs, Button, Avatar, Modal, Input, Divider, message, InputNumber } from 'antd';
 import LeaderBoard from './LeaderBoard';
 import Home from './Home';
 import 'antd/dist/antd.css';
@@ -49,7 +49,7 @@ class App extends React.Component {
       right: <span>
           <Button type="primary" style={{marginRight: 20}} onClick={this.getAccount}>Connect Wallet</Button>
           <Button type="primary" style={{marginRight: 20}} onClick={this.handleShowVote}>Buy Vote</Button>
-          <Button type="primary" style={{marginRight: 20}} onClick={this.getVote}>Vote</Button>
+          <Button type="primary" style={{marginRight: 20}} onClick={this.getVote}>Info</Button>
           </span>
     };
   };
@@ -106,6 +106,15 @@ class App extends React.Component {
     }
   }
 
+  voteInfo = (vote_number) => {
+    message.info('You currently have ' +  vote_number + ' vote(s)');
+  };
+
+  buyVoteInfo = (vote_number) => {
+    message.success('You purchase ' +  vote_number + ' vote(s) successfully!');
+  };
+  
+
   getVote =async()=> {
     console.log("contract address " + this.state.contractAccount);
     console.log("contract balance: " + await this.state.web3.eth.getBalance(this.state.contractAccount));
@@ -117,6 +126,7 @@ class App extends React.Component {
         let admin = await this.state.voteContract.methods.getAdmin().call();
         console.log("dog vote: " + vote_number);
         console.log("admin: " + admin);
+        this.voteInfo(vote_number);
       } catch (e) {
         console.log('Error, deposit: ', e)
       }
@@ -141,6 +151,7 @@ class App extends React.Component {
       const value = number * 10**17;
       try{
         await this.state.voteContract.methods.buyVote(number).send({value: value.toString(), from: this.state.userAccount})
+        this.buyVoteInfo(number);
       } catch (e) {
         console.log('Error, deposit: ', e)
       }

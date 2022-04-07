@@ -10,7 +10,7 @@ import PuppyVote from './abis/PuppyVote.json';
 
 const web3 = new Web3(window.ethereum);
 const netId = 5777;
-const voteContract1 = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[netId].address);
+const voteContract = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[netId].address);
 
 const success = () => {
     message.success('Vote Successfully!');
@@ -20,8 +20,12 @@ const voteError = () => {
   message.error('Not enough vote or ether!');
 };
 
+const endVoteError = () => {
+  message.error('No permission! Only admin can end vote!');
+};
+
 const LeaderBoard = (props) => {
-  const {userAccount, voteContract, contractAccount} = props;
+  const {userAccount, contractAccount} = props;
   const [dogsInfo, setDogsInfo] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [isInitialized, setIsInitialize] = useState(false);
@@ -110,8 +114,10 @@ const LeaderBoard = (props) => {
     },
   ];
 
-  const countDown = () => {
-    endVote();
+  const countDown = async() => {
+    if(await endVote() === false) {
+      return;
+    }
     const modal = Modal.success({
       title: 'End Vote successfully',
       width: 460,
@@ -150,9 +156,11 @@ const LeaderBoard = (props) => {
   }
 
   const getVote = async()=> {
-    if(voteContract!=='undefined'){
+    if(voteContract!=='undefined' && voteContract !== 'null'){
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const account = accounts[0];
       try{
-        let vote_number = await voteContract1.methods.getUserVote(userAccount).call();
+        let vote_number = await voteContract.methods.getUserVote(account).call();
         console.log("dog vote: " + vote_number);
         setVoteNumber(vote_number);
       } catch (e) {
@@ -163,14 +171,24 @@ const LeaderBoard = (props) => {
 
   const endVote = async()=> {
     if(voteContract!=='undefined'){
-      console.log("dbank: ", contractAccount);
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const account = accounts[0];
+      let admin = await voteContract.methods.getAdmin().call();
+      console.log(account);
+      console.log(admin);
+      if (account.toUpperCase() !== admin.toUpperCase()) {
+        console.log('flase');
+        endVoteError();
+        return false;
+      }
+      console.log('flase true');
       try{
-        let admin = await voteContract.methods.getAdmin().call();
-        console.log("admin " + admin);
         await voteContract.methods.endVote().send({from: admin});
+        getDogInfo();
       } catch (e) {
         console.log('Error, end vote: ', e)
       }
+      return true;
     }
   }
 

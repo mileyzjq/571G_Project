@@ -10,7 +10,7 @@ const client = create('https://ipfs.infura.io:5001/api/v0');
 const { Option } = Select;
 const web3 = new Web3(window.ethereum);
 const netId = 5777;
-const voteContract1 = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[netId].address);
+const voteContract = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[netId].address);
 const items = ["nice", "lovely", "cool", "smart", "loser", "cute", "pretty", "naughty"];
 
 const children = []
@@ -24,8 +24,6 @@ class DogForm extends React.Component {
       formVisible: false,
       urlArr: "",
       file: null,
-      userAccount: this.props.userAccount,
-      voteContract: voteContract1,
       owner: "",
       puppyName: "",
       gender: "",
@@ -34,25 +32,8 @@ class DogForm extends React.Component {
       tags:[],
     };
   }
-  
-  getDog = async() => {
-    const accounts = await web3.eth.getAccounts();
-    const userAccount1 = accounts[0];
-    console.log("account1 ", userAccount1);
-    if(this.state.voteContract!=='undefined'){
-      try{
-        let dogs = await this.state.voteContract.methods.getDogs().call({from: this.state.userAccount});
-        console.log("dog array: " + dogs[0]);
-        console.log("dog array length: " + dogs.length);
-      } catch (e) {
-        console.log('Error, deposit: ', e)
-      }
-    }
-  }
 
   retrieveFile = (e) => {
-    console.log("account: " + this.state.userAccount);
-    console.log("vote " + this.state.voteContract);
     const data = e.target.files[0];
     const reader = new window.FileReader();
     reader.readAsArrayBuffer(data);
@@ -83,16 +64,11 @@ class DogForm extends React.Component {
     console.log("submit");
     if(this.state.voteContract!=='undefined'){
       try{
-        console.log("tags: " + children);
-        console.log("pictures: " + this.state.urlArr);
-        console.log("contract-state: " + this.state.voteContract);
-        console.log("contract-account: " + this.state.userAccount);
-        console.log("contract1: " + voteContract1);
         const accounts = await web3.eth.getAccounts();
         const userAccount1 = accounts[0];
         console.log(userAccount1);
-        const {voteContract, puppyName, gender, birthday, tags, description, urlArr, userAccount} = this.state;
-        await voteContract1.methods.createDogProfile(puppyName, gender, birthday, tags, description, urlArr).send({value: "100000000000000000", from: userAccount1})
+        const {puppyName, gender, birthday, tags, description, urlArr} = this.state;
+        await voteContract.methods.createDogProfile(puppyName, gender, birthday, tags, description, urlArr).send({value: "100000000000000000", from: userAccount1})
         this.props.uploadDogCard();
       } catch (e) {
         console.log('Error, something wrong happened when creating a dog profile: ', e)
@@ -180,7 +156,6 @@ class DogForm extends React.Component {
             <button type="submit" className="btn" >Upload file</button>
         </form>
         <Button type="primary" style={{marginTop: 20, marginLeft: 10}} onClick={this.profileSubmit}>Submit</Button>
-        <Button type="primary" style={{marginTop: 20, marginLeft: 10}} onClick={this.getDog}>Dogs</Button>
       </div>  
     );
   }

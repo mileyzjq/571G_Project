@@ -85,11 +85,7 @@ contract("PuppyVote", (accounts) => {
         await voting.createDogProfile("Nancy", "female", "2020-01-02", ["cute"], "I am a dog", "https://ipfs.infura.io/ipfs/QmR74ePYb4b231PWwAEs3RkHz5erfCgoVYZfnXAFgWcPrQ", {value: "100000000000000000", addr2});
         await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
         await voting.vote(2, "Nancy", addr1, {from: addr1});
-        const beforePurchaseBalance = await voting.getBalance({from: addr2});
-        console.log("before: " + Number(addr2.balance));
         await voting.endVote({from: owner});
-        const afterPurchaseBalance = await voting.getBalance({from: addr2});
-        console.log("after: " + Number(addr2.balance));
         expect(Number(await voting.getAdoptDogVote(addr1))).to.be.eq(0);
     });
 
