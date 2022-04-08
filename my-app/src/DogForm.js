@@ -1,6 +1,6 @@
 import { create } from "ipfs-http-client";
 import React, { useState } from 'react';
-import { Form, Input, Button, Radio, DatePicker, Upload, Select } from 'antd';
+import { Form, Input, Button, Radio, DatePicker, message, Select } from 'antd';
 import { InfoCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import Web3 from 'web3/dist/web3.min.js';
 import PuppyVote from './abis/PuppyVote.json';
@@ -15,6 +15,10 @@ const items = ["nice", "lovely", "cool", "smart", "loser", "cute", "pretty", "na
 
 const children = []
 items.forEach((v, i) => children.push(<Option key={v}>{v}</Option>));
+
+const success = () => {
+  message.success('Create a puppy profile successfully!');
+};
 
 const DogForm = (props) => {
   const {uploadDogCard} = props;
@@ -73,6 +77,7 @@ const DogForm = (props) => {
         setDescription("");
         setFile(null);
         setUrlArr("");
+        success();
       } catch (e) {
         console.log('Error, something wrong happened when creating a dog profile: ', e)
       }
