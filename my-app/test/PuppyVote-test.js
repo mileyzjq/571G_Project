@@ -9,7 +9,7 @@ contract("PuppyVote", (accounts) => {
     let voting;
     let owner = accounts[0];
     let addr1 = accounts[1];
-    let addr2;
+    let addr2 = accounts[2];
     
     beforeEach(async function () {
         //VotingShop = await puppyVote.new({from: owner});
@@ -52,13 +52,13 @@ contract("PuppyVote", (accounts) => {
 
     it("Can not vote if not enough vote", async function () {
         await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
-        await voting.vote(3,addr1, {from: addr1}).should.be.rejectedWith("You can't vote more votes than you have!");
+        await voting.vote(3, "", addr1, {from: addr1}).should.be.rejectedWith("You can't vote more votes than you have!");
     });
 
     it("Can vote if everything is Ok", async function () {
         await voting.createDogProfile("Nancy", "female", "2020-01-02", ["nice"], "I am a dog", "https://ipfs.infura.io/ipfs/QmR74ePYb4b231PWwAEs3RkHz5erfCgoVYZfnXAFgWcPrQ", {value: "100000000000000000"});
         await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
-        await voting.vote(1,addr1, {from: addr1})
+        await voting.vote(1, "Nancy", addr1, {from: addr1})
         expect(Number(await voting.userVoteBalance(addr1))).to.be.eq(1);
 
         // console.log(await voting.adopt(addr1.address));
@@ -75,36 +75,29 @@ contract("PuppyVote", (accounts) => {
         const beforePurchaseBalance = await voting.getBalance({from: owner});
         await voting.createDogProfile("Nancy", "female", "2020-01-02", ["cute"], "I am a dog", "https://ipfs.infura.io/ipfs/QmR74ePYb4b231PWwAEs3RkHz5erfCgoVYZfnXAFgWcPrQ", {value: "100000000000000000"});
         await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
-        await voting.vote(2,addr1, {from: addr1});
+        await voting.vote(2, "Nancy", addr1, {from: addr1});
         await voting.endVote({from: owner});
         const afterPurchaseBalance = await voting.getBalance({from: owner});
         await expect(Number(afterPurchaseBalance)).to.be.eq(Number(beforePurchaseBalance));
     });
 
     it("After owner end the votes, dogs's vote number should be reset to zero", async function () {
-        await voting.createDogProfile("Nancy", "female", "2020-01-02", ["cute"], "I am a dog", "https://ipfs.infura.io/ipfs/QmR74ePYb4b231PWwAEs3RkHz5erfCgoVYZfnXAFgWcPrQ", {value: "100000000000000000"});
+        await voting.createDogProfile("Nancy", "female", "2020-01-02", ["cute"], "I am a dog", "https://ipfs.infura.io/ipfs/QmR74ePYb4b231PWwAEs3RkHz5erfCgoVYZfnXAFgWcPrQ", {value: "100000000000000000", addr2});
         await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
-        await voting.vote(2,addr1, {from: addr1});
+        await voting.vote(2, "Nancy", addr1, {from: addr1});
         await voting.endVote({from: owner});
         expect(Number(await voting.getAdoptDogVote(addr1))).to.be.eq(0);
     });
 
-    it("after calling the delete function, the corresponding puppy information should be deleted", async function () {
+    it("After calling the delete function, the corresponding puppy information should be deleted", async function () {
         
         await voting.createDogProfile("Nancy", "female", "2020-01-02", ["nice"], "I am a dog", "https://ipfs.infura.io/ipfs/QmR74ePYb4b231PWwAEs3RkHz5erfCgoVYZfnXAFgWcPrQ",{value: "100000000000000000"});
-        
+        await voting.createDogProfile("Lily", "female", "2020-03-02", ["nice","lovely"], "I am a dog", "https://ipfs.infura.io/ipfs/QmR74ePYb4b231PWwAEs3RkHz5erfCgoVYZfnXAFgWcPrQ",{value: "100000000000000000"});
         var dogs = await voting.getDogs({from: addr1});
-        // var name = await voting.getDogByIndex(len - 2)[0];
-        console.log("before delete: "+ Number(dogs.length));
-        // console.log("voting.dogs"+voting.dogs);
-        // console.log("voting.dogs[0]: "+voting.dogs[0]);
-        // console.log("length before delete: "+ len);
-        await voting.deleteDogProfile("Nancy", addr1, {from: addr1});
-        console.log("after delete: "+ Number(dogs.length));
-        //var len = await voting.getDogs().length;
-        // console.log("length after delete: "+ len);
-        // console.log("after delete: "+voting.dogs.length);
-        //expect(Number(await voting.getDogs().length)).to.be.eq(0);
+        await voting.deleteDogProfile("Nancy");
+        var new_dogs = await voting.getDogs({from: addr1});
+        expect(Number(new_dogs.length)).to.be.eq(1);
+
     });
 
 });

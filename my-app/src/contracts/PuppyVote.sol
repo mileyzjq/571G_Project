@@ -45,14 +45,14 @@ contract PuppyVote{
         adopt[msg.sender] = newDog;
         dogs.push(newDog);
     }
-    function deleteDogProfile(string memory _dogName, address dogOwner) public {
+    function deleteDogProfile(string memory _dogName) public {
             uint256 l = dogs.length;
-            for (uint i = 0; i < l; i++) {
-            if(dogs[i].ownerAddress == dogOwner && keccak256(bytes(dogs[i].puppyName)) == keccak256(bytes(_dogName))) {
-                dogs[i] = dogs[l - 1];
-                dogs.pop();
+            for (uint i = 0; i < l; i++){
+                if(dogs[i].ownerAddress == msg.sender && keccak256(bytes(dogs[i].puppyName)) == keccak256(bytes(_dogName))){
+                    dogs[i] = dogs[l - 1];
+                }
             }
-        }
+            dogs.pop();
     }
     // there should be some input protection in the front end
     function buyVote(uint256 _buyVoteNum) public payable{
