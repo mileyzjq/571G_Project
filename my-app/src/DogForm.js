@@ -66,6 +66,13 @@ const DogForm = (props) => {
         console.log(urlArr);
         await voteContract.methods.createDogProfile(puppyName, gender, birthday, tags, description, urlArr).send({value: "100000000000000000", from: userAccount1})
         props.uploadDogCard();
+        setPuppyName("");
+        setGender("");
+        setBirthday("");
+        setTags([]);
+        setDescription("");
+        setFile(null);
+        setUrlArr("");
       } catch (e) {
         console.log('Error, something wrong happened when creating a dog profile: ', e)
       }
@@ -85,7 +92,7 @@ const DogForm = (props) => {
 
   const genderChange =(e)=> {
     console.log("gender: " + e.target.value);
-    setGender("e.target.value");
+    setGender(e.target.value);
   }
 
   const birthdayChange =(moment, string)=> {
@@ -133,11 +140,11 @@ const DogForm = (props) => {
               <TextArea rows={5} showCount maxLength={300} onChange={descriptionChange} />
           </Form.Item>
       </Form>
-      <form className="form" onSubmit={handleSubmit} style={{marginLeft: 10, marginTop: 10}}>
+      <form className="form" onSubmit={handleSubmit} style={{marginLeft: 30, marginTop: 10}}>
           <input type="file" name="data" onChange={retrieveFile} />
           <button type="submit" className="btn" >Upload file</button>
       </form>
-      <Button type="primary" style={{marginTop: 20, marginLeft: 10}} onClick={profileSubmit}>Submit</Button>
+      <Button type="primary" style={{marginTop: 20, marginLeft: 30}} onClick={profileSubmit}>Submit</Button>
     </div>  
   );
 };

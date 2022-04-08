@@ -1,10 +1,8 @@
 import { Table, Tag, Space, Button, Avatar, message, Modal, Result } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { ManOutlined, WomanOutlined } from '@ant-design/icons';
 import './App.css';
-import dogImage from './image/dog1.jpeg';
-import dogImage2 from './image/dog2.webp';
 import crown from './image/crown.webp';
-import DogCard from './DogCard';
 import Web3 from 'web3/dist/web3.min.js';
 import PuppyVote from './abis/PuppyVote.json';
 
@@ -30,7 +28,6 @@ const LeaderBoard = (props) => {
   const [tableData, setTableData] = useState([]);
   const [isInitialized, setIsInitialize] = useState(false);
   const [voteNumber, setVoteNumber] = useState(0);
-  const [admin, setAdmin] = useState("");
 
   useEffect(() => {
     if(!isInitialized) {
@@ -73,6 +70,7 @@ const LeaderBoard = (props) => {
       dataIndex: 'gender',
       key: 'gender',
       className: "table-replaceColor",
+      render: text => (text === "male" ? <ManOutlined style={{color: 'green', marginRight: 10}} /> : <WomanOutlined style={{color: 'red', marginRight: 10}}/> )
     },
     {
       title: 'Vote Counts',
@@ -90,7 +88,7 @@ const LeaderBoard = (props) => {
         <span>
           {tags.map(tag => {
             let color = tag.length > 5 ? 'geekblue' : 'green';
-            if (tag === 'lazy' || tag === 'pretty') {
+            if (tag === 'lazy' || tag === 'pretty' || tag === 'cute') {
               color = 'volcano';
             }
             return (
