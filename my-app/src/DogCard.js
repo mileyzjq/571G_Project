@@ -1,4 +1,4 @@
-import { Card, Badge, Avatar, Modal, Row, Typography, message } from 'antd';
+import { Card, Badge, Avatar, Modal, Row, Typography, message, InputNumber } from 'antd';
 import { EuroCircleOutlined, LikeOutlined, DislikeOutlined, LikeTwoTone, ManOutlined, WomanOutlined, DislikeTwoTone } from '@ant-design/icons';
 import React, { useState, useEffect} from 'react';
 import dogImage2 from './image/dog2.webp';
@@ -22,8 +22,9 @@ const voteContract = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[net
 
 
 const DogCard = (props) => {
-    const {userAccount, dogInfo} = props;
+    const {userAccount, dogInfo, voteModal} = props;
     const [profileVisible, setVisible] = useState(false);
+    const [votes, setVotes] = useState(false);
     const [likeColor, setLikeColor] = useState(true);
     const [dislikeColor, setDislikeColor] = useState(true);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -47,6 +48,14 @@ const DogCard = (props) => {
 
     const handleOk = () => {
         setIsModalVisible(false);
+        if(voteContract!=='undefined'){
+
+            try{
+              votePuppy(votes, dogInfo[0], dogInfo[2]);
+                    } catch (e) {
+              console.log('Error, deposit: ', e)
+            }
+          }
     };
 
     const handleCancel = () => {
@@ -73,8 +82,16 @@ const DogCard = (props) => {
           <div style={{ flex: 1, marginLeft: 30}}>{children}</div>
         </Row>
     );
-    
-    const  votePuppy = async(dogOwner, dogName) => {
+
+
+
+    const  inputNumberChange = (value) => {
+        console.log("onchange: " + value);
+        setVotes(value);
+        
+      }
+
+    const  votePuppy = async(votes, dogOwner, dogName) => {
         // const {userAccount, voteContract} = this.props;
         console.log("voteContract: "+voteContract);
         // console.log("dogOwner: " + dogOwner);
@@ -83,7 +100,7 @@ const DogCard = (props) => {
         console.log("account: "+account);
         let voteNumber = await voteContract.methods.getUserVote(account).call();
         console.log("voteNumber: ", voteNumber);
-        if(voteNumber < 1) {
+        if(votes > voteNumber) {
           console.log("User's vote number is not enough", voteNumber);
           voteError();
           return;
@@ -91,7 +108,7 @@ const DogCard = (props) => {
         if(voteContract!=='undefined'){
           console.log("owner: ", dogOwner);
           try{
-            await voteContract.methods.vote(1, dogName, dogOwner).send({from: account});
+            await voteContract.methods.vote(votes, dogName, dogOwner).send({from: account});
             success();
           } catch (e) {
             console.log('Error, getDog: ', e)
@@ -132,8 +149,10 @@ const DogCard = (props) => {
                 />
                 }
                 actions={[
-                    
-                <EuroCircleOutlined key="dog-vote" onClick={()=>votePuppy(dogInfo[0], dogInfo[2])} />,
+                
+                <EuroCircleOutlined key="dog-vote" onClick={()=>showModal()} />,
+                // <EuroCircleOutlined key="dog-vote" onClick={()=>votePuppy()} />,
+                
                 <div onClick={changeLikeColor}>
                     {likeColor ? <LikeOutlined /> : <LikeTwoTone key="dog-like" twoToneColor="red" style={{fontSize: 20}}/> }
                 </div>,
@@ -161,10 +180,9 @@ const DogCard = (props) => {
                     {content}
                 </Content>
             </Modal>
-            <Modal title="Basic Modal" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-                <p>Some contents...</p>
+            <Modal title="Vote for your favourite puppy!" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+            <p>How many votes do you want to vote? </p>
+          <InputNumber min={1} max={10} onChange={inputNumberChange} />
             </Modal>
         </div>   
     );
