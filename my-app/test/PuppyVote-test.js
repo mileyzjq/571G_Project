@@ -89,4 +89,22 @@ contract("PuppyVote", (accounts) => {
         expect(Number(await voting.getAdoptDogVote(addr1))).to.be.eq(0);
     });
 
+    it("after calling the delete function, the corresponding puppy information should be deleted", async function () {
+        
+        await voting.createDogProfile("Nancy", "female", "2020-01-02", ["nice"], "I am a dog", "https://ipfs.infura.io/ipfs/QmR74ePYb4b231PWwAEs3RkHz5erfCgoVYZfnXAFgWcPrQ",{value: "100000000000000000"});
+        
+        var dogs = await voting.getDogs({from: addr1});
+        // var name = await voting.getDogByIndex(len - 2)[0];
+        console.log("before delete: "+ Number(dogs.length));
+        // console.log("voting.dogs"+voting.dogs);
+        // console.log("voting.dogs[0]: "+voting.dogs[0]);
+        // console.log("length before delete: "+ len);
+        await voting.deleteDogProfile("Nancy", addr1, {from: addr1});
+        console.log("after delete: "+ Number(dogs.length));
+        //var len = await voting.getDogs().length;
+        // console.log("length after delete: "+ len);
+        // console.log("after delete: "+voting.dogs.length);
+        //expect(Number(await voting.getDogs().length)).to.be.eq(0);
+    });
+
 });
