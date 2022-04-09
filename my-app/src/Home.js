@@ -96,7 +96,6 @@ const Home =()=> {
   }
 
   const onOkWithDelete = async() => {
-    setFormVisibleDelete(false);
     const accounts = await web3.eth.getAccounts();
     const userAccount1 = accounts[0];
     console.log("account： ", userAccount1);
@@ -123,13 +122,14 @@ const Home =()=> {
         console.log('Error, cannot delete: ', e)
       }
     }
+    setFormVisibleDelete(false);
   }
     
   return (
     <div className="App-setting">
       <div className='title-container'>
         <h1 style={{fontWeight: 'bold', textAlign: 'center'}}>Vote for your Favourite puppies! </h1>
-        <span>
+        <span style={{marginBottom: 15}}>
           <Button type="primary" style={{marginRight: 30}} onClick={() => showForm()}>Upload A Puppy</Button>
           <Button type="primary" onClick={() => showFormDelete()}>Delete A Puppy</Button>
         </span>
