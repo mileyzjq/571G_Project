@@ -11,7 +11,7 @@ const { Option } = Select;
 const web3 = new Web3(window.ethereum);
 const netId = 5777;
 const voteContract = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[netId].address);
-const items = ["nice", "lovely", "cool", "smart", "loser", "cute", "pretty", "naughty"];
+const items = ["nice", "lovely", "cool", "smart", "lazy", "cute", "pretty", "naughty"];
 
 const children = []
 items.forEach((v, i) => children.push(<Option key={v}>{v}</Option>));
@@ -70,13 +70,6 @@ const DogForm = (props) => {
         console.log(urlArr);
         await voteContract.methods.createDogProfile(puppyName, gender, birthday, tags, description, urlArr).send({value: "100000000000000000", from: userAccount1})
         props.uploadDogCard();
-        setPuppyName("");
-        setGender("");
-        setBirthday("");
-        setTags([]);
-        setDescription("");
-        setFile(null);
-        setUrlArr("");
         success();
       } catch (e) {
         console.log('Error, something wrong happened when creating a dog profile: ', e)

@@ -16,7 +16,7 @@ const deleteError = () => {
 };
 
 const deleteSuccess = () => {
-  message.success('Vote Successfully!');
+  message.success('Delete a puppy Successfully!');
 };
 
 const Home =()=> {
