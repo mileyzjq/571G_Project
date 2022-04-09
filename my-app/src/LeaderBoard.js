@@ -1,4 +1,4 @@
-import { Table, Tag, Space, Button, Avatar, message, Modal, Result } from 'antd';
+import { Table, Tag, Space, Button, Avatar, message, Modal, Result, InputNumber } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { ManOutlined, WomanOutlined } from '@ant-design/icons';
 import './App.css';
@@ -27,7 +27,10 @@ const LeaderBoard = (props) => {
   const [dogsInfo, setDogsInfo] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [isInitialized, setIsInitialize] = useState(false);
-  const [voteNumber, setVoteNumber] = useState(0);
+  const [votes, setVotes] = useState(0);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [voteDogName, setVoteDogName] = useState("");
+  const [voteDogOwner, setVoteDogOwner] = useState("");
 
   useEffect(() => {
     if(!isInitialized) {
@@ -106,7 +109,7 @@ const LeaderBoard = (props) => {
       className: "table-replaceColor",
       render: (text, record) => (
         <Space size="middle">
-          <Button type="primary" onClick={()=>votePuppy(record.owner, record.name)}>Vote {record.name}</Button>
+          <Button type="primary" onClick={()=>showModal(record.owner, record.name)}>Vote {record.name}</Button>
         </Space>
       ),
     },
@@ -131,20 +134,25 @@ const LeaderBoard = (props) => {
     }, 6000);
   }
 
-  const votePuppy = async(dogOwner, dogName) => {
+  const showModal = (dogOwner, dogName) => {
+    setVoteDogName(dogName);
+    setVoteDogOwner(dogOwner);
+    setIsModalVisible(true);
+  };
+
+  const votePuppy = async() => {
     let voteNumber = await voteContract.methods.getUserVote(userAccount).call();
     console.log("hello: ", voteNumber);
-    if(voteNumber < 1) {
-      console.log("hello: ", voteNumber);
+    if(voteNumber < votes) {
       voteError();
       return;
     }
     if(voteContract!=='undefined'){
-      console.log("owner: ", dogOwner);
+      console.log("owner: ", voteDogOwner);
       try{
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const account = accounts[0];
-        await voteContract.methods.vote(1, dogName, dogOwner).send({from: account});
+        await voteContract.methods.vote(votes, voteDogName, voteDogOwner).send({from: account});
         success();
         getDogInfo();
       } catch (e) {
@@ -160,7 +168,6 @@ const LeaderBoard = (props) => {
       try{
         let vote_number = await voteContract.methods.getUserVote(account).call();
         console.log("dog vote: " + vote_number);
-        setVoteNumber(vote_number);
       } catch (e) {
         console.log('Error, vote number: ', e)
       }
@@ -226,6 +233,26 @@ const LeaderBoard = (props) => {
     setTableData([...list]);
   }
 
+  const  inputNumberChange = (value) => {
+    console.log("onchange: " + value);
+    setVotes(value);
+  }
+
+  const handleOk = async() => {
+    if(voteContract!=='undefined'){
+        try{
+          await votePuppy();
+        } catch (e) {
+          console.log('Error, deposit: ', e)
+        }
+    }
+    setIsModalVisible(false);
+};
+
+const handleCancel = () => {
+    setIsModalVisible(false);
+};
+
   return (
     <div style={{width: "90%", marginLeft: "4%", color: "#f7f7f7", marginTop: "40"}}>
       <Button type="primary" onClick={countDown} style={{marginBottom: 15}}> End Vote </Button>
@@ -234,6 +261,10 @@ const LeaderBoard = (props) => {
         columns={columns}
         dataSource={tableData}
       />
+      <Modal title="Vote Puppy" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+          <p>How many votes do you want to vote? </p>
+          <InputNumber min={1} max={10} onChange={inputNumberChange} />
+      </Modal>
     </div>
   );
 }

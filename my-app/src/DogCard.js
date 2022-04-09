@@ -22,40 +22,26 @@ const voteContract = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[net
 
 
 const DogCard = (props) => {
-    const {userAccount, dogInfo, voteModal} = props;
+    const {userAccount, dogInfo} = props;
     const [profileVisible, setVisible] = useState(false);
-    const [votes, setVotes] = useState(false);
+    const [votes, setVotes] = useState(0);
     const [likeColor, setLikeColor] = useState(true);
     const [dislikeColor, setDislikeColor] = useState(true);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [isInitialized, setIsInitialize] = useState(false);
-
-    useEffect(() => {
-        if(!isInitialized) {
-            console.log("userAccount: " + userAccount);
-            console.log("gender: " + dogInfo[3]);
-            console.log("dogInfo[dogInfo.length - 1][2]： " + dogInfo[dogInfo.length - 1][2]);
-            console.log("dogInfo： " + dogInfo);
-            console.log("dogInfo[dogInfo.length - 1]： " + dogInfo[dogInfo.length - 1]);
-            console.log("dogInfo.length： " + dogInfo.length);
-        }
-        setIsInitialize(true);
-      }, [isInitialized]);
 
     const showModal = () => {
         setIsModalVisible(true);
     };
 
-    const handleOk = () => {
-        setIsModalVisible(false);
+    const handleOk = async() => {
         if(voteContract!=='undefined'){
-
             try{
-              votePuppy(votes, dogInfo[0], dogInfo[2]);
-                    } catch (e) {
+              await votePuppy(votes, dogInfo[0], dogInfo[2]);
+            } catch (e) {
               console.log('Error, deposit: ', e)
             }
-          }
+        }
+        setIsModalVisible(false);
     };
 
     const handleCancel = () => {
@@ -180,9 +166,9 @@ const DogCard = (props) => {
                     {content}
                 </Content>
             </Modal>
-            <Modal title="Vote for your favourite puppy!" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-            <p>How many votes do you want to vote? </p>
-          <InputNumber min={1} max={10} onChange={inputNumberChange} />
+            <Modal title="Vote Puppy" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+                <p>How many votes do you want to vote? </p>
+                <InputNumber min={1} max={10} onChange={inputNumberChange} />
             </Modal>
         </div>   
     );
