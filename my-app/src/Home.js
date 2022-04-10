@@ -63,12 +63,16 @@ const Home =()=> {
     console.log(dogInfo[0]);
     return (<div class="dog-card-container">
       {
-        dogInfo.map(dog => {return (<DogCard class="dog-card-item" dogInfo={[...dog]} />)})
+        dogInfo.map(dog => {return (<DogCard class="dog-card-item" dogInfo={[...dog]} updateDogVotes={updateDogVotes} />)})
       }
     </div>);
   }
 
   const uploadDogCard =()=> {
+    getDogInfo();
+  }
+
+  const updateDogVotes =()=> {
     getDogInfo();
   }
 
@@ -112,11 +116,8 @@ const Home =()=> {
         console.log("dog array length before delete: " + dogInfo.length);
         console.log("voteContract1"+voteContract1);
         await voteContract1.methods.deleteDogProfile(puppyName).send({from: userAccount1});
-        const dogs = await voteContract1.methods.getDogs().call({from: userAccount1});
-        setDogsInfo([...dogs]);
+        getDogInfo();
         deleteSuccess();
-        console.log("dogs[0]" + dogs[0]);
-        console.log("dogs[1]" + dogs[1]);
         console.log("dog array length after delete: " + dogInfo.length);
       } catch (e) {
         console.log('Error, cannot delete: ', e)

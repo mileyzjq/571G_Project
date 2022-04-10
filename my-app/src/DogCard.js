@@ -1,10 +1,8 @@
 import { Card, Badge, Avatar, Modal, Row, Typography, message, InputNumber } from 'antd';
 import { EuroCircleOutlined, LikeOutlined, DislikeOutlined, LikeTwoTone, ManOutlined, WomanOutlined, DislikeTwoTone } from '@ant-design/icons';
 import React, { useState, useEffect} from 'react';
-import dogImage2 from './image/dog2.webp';
 import Web3 from 'web3/dist/web3.min.js';
 import PuppyVote from './abis/PuppyVote.json';
-import { render } from '@testing-library/react';
 
 const { Paragraph, Title } = Typography;
 
@@ -22,7 +20,7 @@ const voteContract = new web3.eth.Contract(PuppyVote.abi, PuppyVote.networks[net
 
 
 const DogCard = (props) => {
-    const {userAccount, dogInfo} = props;
+    const {updateDogVotes, dogInfo} = props;
     const [profileVisible, setVisible] = useState(false);
     const [votes, setVotes] = useState(0);
     const [likeColor, setLikeColor] = useState(true);
@@ -37,6 +35,7 @@ const DogCard = (props) => {
         if(voteContract!=='undefined'){
             try{
               await votePuppy(votes, dogInfo[0], dogInfo[2]);
+              updateDogVotes();
             } catch (e) {
               console.log('Error, deposit: ', e)
             }
@@ -70,14 +69,13 @@ const DogCard = (props) => {
     );
 
 
-
-    const  inputNumberChange = (value) => {
+    const inputNumberChange = (value) => {
         console.log("onchange: " + value);
         setVotes(value);
         
       }
 
-    const  votePuppy = async(votes, dogOwner, dogName) => {
+    const votePuppy = async(votes, dogOwner, dogName) => {
         // const {userAccount, voteContract} = this.props;
         console.log("voteContract: "+voteContract);
         // console.log("dogOwner: " + dogOwner);
