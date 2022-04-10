@@ -93,7 +93,7 @@ contract PuppyVote{
         // the winning dog
         Dog memory winningDog = result[0];
         address winner = winningDog.ownerAddress;
-        payable(winner).transfer(address(this).balance);
+        payable(winner).transfer((address(this).balance)/5*4);
         //payable(owner).transfer(address(this).balance);//transfer money back to owner
         reset();
     }

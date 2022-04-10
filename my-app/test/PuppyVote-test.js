@@ -72,13 +72,13 @@ contract("PuppyVote", (accounts) => {
 
     it("Owner can end the votes if everything is okay", async function () {
         
-        const beforePurchaseBalance = await voting.getBalance({from: owner});
         await voting.createDogProfile("Nancy", "female", "2020-01-02", ["cute"], "I am a dog", "https://ipfs.infura.io/ipfs/QmR74ePYb4b231PWwAEs3RkHz5erfCgoVYZfnXAFgWcPrQ", {value: "100000000000000000"});
         await voting.buyVote(2,{value:"200000000000000000", from: addr1});//0.2ether
         await voting.vote(2, "Nancy", addr1, {from: addr1});
+        const beforeEndVoteBalance = await voting.getBalance({from: owner});
         await voting.endVote({from: owner});
         const afterPurchaseBalance = await voting.getBalance({from: owner});
-        await expect(Number(afterPurchaseBalance)).to.be.eq(Number(beforePurchaseBalance));
+        await expect(Number(afterPurchaseBalance)).to.be.eq(Number(beforeEndVoteBalance)/5);
     });
 
     it("After owner end the votes, dogs's vote number should be reset to zero", async function () {
