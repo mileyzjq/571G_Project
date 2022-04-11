@@ -1,5 +1,6 @@
 import { Tabs, Button, Avatar, Modal, Input, Divider, message, InputNumber } from 'antd';
 import LeaderBoard from './LeaderBoard';
+import MyDog from './MyDog';
 import Home from './Home';
 import 'antd/dist/antd.css';
 import Icon from './image/icon.webp';
@@ -30,7 +31,10 @@ class App extends React.Component {
       voteContract: null,
       web3: null,
       buyVoteNumber: 3,
-      voteNumber: 6
+      voteNumber: 6,
+      dogInfo: [],
+      isUpdated: false,
+      isUpdatedVotes: false,
     };
   }
 
@@ -139,6 +143,7 @@ class App extends React.Component {
       try{
         await this.state.voteContract.methods.buyVote(number).send({value: value.toString(), from: this.state.userAccount})
         this.buyVoteInfo(number);
+        this.updateVotes();
       } catch (e) {
         console.log('Error, deposit: ', e)
       }
@@ -170,24 +175,41 @@ class App extends React.Component {
     this.loadBlockchainData();
   }
 
+  updateDogCard =()=> {
+    console.log("update");
+    this.setState({
+      isUpdated: !this.state.isUpdated,
+    });
+  }
+
+  updateVotes =()=> {
+    console.log("update");
+    this.setState({
+      isUpdatedVotes: !this.state.isUpdatedVotes,
+    });
+  }
+
   render() {
-    const {userAccount, voteContract, contractAccount} = this.state;
+    const {userAccount, voteContract, isUpdatedVotes, isUpdated} = this.state;
     
     return (
       <div>
         <Tabs defaultActiveKey="1" onChange={this.callback} tabBarExtraContent={this.OperationsSlot()} tabBarStyle={{backgroundColor: '#f7f7f7'}}>
           <TabPane tab="Home" key="1">
             <div>
-              <Home voteContract={voteContract} />
+              <Home updateDogCard={this.updateDogCard} updateVotes={this.updateVotes}/>
             </div>
           </TabPane>
           <TabPane tab="LeaderBoard" key="2">
-              <LeaderBoard userAccount={userAccount} voteContract={voteContract} contractAccount={contractAccount} />
+              <LeaderBoard userAccount={userAccount} voteContract={voteContract} updateVotes={this.updateVotes} />
+          </TabPane>
+          <TabPane tab="My Dogs" key="3">
+              <MyDog isUpdated={isUpdated} isUpdatedVotes={isUpdatedVotes} userAccount={userAccount}/>
           </TabPane>
         </Tabs>
         <Modal title="Buy Vote" visible={this.state.voteModal} onOk={this.handleVoteOk} onCancel={this.handleVoteCancel}>
           <p>How many votes do you want to buy? </p>
-          <p>Each vote cost 0.1 Ether</p>
+          <p>Each vote costs 0.1 Ether.</p>
           <InputNumber min={1} max={10} onChange={this.inputNumberChange} />
         </Modal>
       </div>

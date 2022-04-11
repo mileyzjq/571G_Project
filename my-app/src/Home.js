@@ -1,6 +1,6 @@
 import './App.css';
 import 'antd/dist/antd.css';
-import { Divider, Button, Modal, Form, Input, Card, message } from 'antd';
+import { Divider, Button, Modal, Form, Input, Carousel, message } from 'antd';
 import DogCard from './DogCard';
 import React, {useState, useEffect} from 'react';
 import DogForm from './DogForm';
@@ -19,7 +19,8 @@ const deleteSuccess = () => {
   message.success('Delete a puppy Successfully!');
 };
 
-const Home =()=> {
+const Home =(props)=> {
+  const {updateDogCard, updateVotes} = props;
   const [formVisible, setFormVisible] = useState(false);
   const [dogInfo, setDogsInfo] = useState([]);
   const [isInitialized, setIsInitialize] = useState(false);
@@ -70,10 +71,12 @@ const Home =()=> {
 
   const uploadDogCard =()=> {
     getDogInfo();
+    updateDogCard();
   }
 
   const updateDogVotes =()=> {
     getDogInfo();
+    updateVotes();
   }
 
   const showFormDelete = () => {
@@ -102,7 +105,7 @@ const Home =()=> {
   const onOkWithDelete = async() => {
     const accounts = await web3.eth.getAccounts();
     const userAccount1 = accounts[0];
-    console.log("account： ", userAccount1);
+    console.log("account: ", userAccount1);
     console.log("dog array length before delete: " + dogInfo.length);
     const flag = findDog(userAccount1);
     console.log(flag);
@@ -118,6 +121,7 @@ const Home =()=> {
         await voteContract1.methods.deleteDogProfile(puppyName).send({from: userAccount1});
         getDogInfo();
         deleteSuccess();
+        updateDogCard();
         console.log("dog array length after delete: " + dogInfo.length);
       } catch (e) {
         console.log('Error, cannot delete: ', e)

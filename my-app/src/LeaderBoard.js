@@ -23,7 +23,7 @@ const endVoteError = () => {
 };
 
 const LeaderBoard = (props) => {
-  const {userAccount} = props;
+  const {userAccount, updateVotes} = props;
   const [dogsInfo, setDogsInfo] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [isInitialized, setIsInitialize] = useState(false);
@@ -38,7 +38,7 @@ const LeaderBoard = (props) => {
       getVote();
     }
     setIsInitialize(true);
-  }, [isInitialized]);
+  }, [isInitialized, userAccount]);
 
   const columns = [
     {
@@ -207,6 +207,7 @@ const LeaderBoard = (props) => {
         console.log("dog array length: " + dogs.length);
         setDogsInfo([...dogs]);
         getTableData(dogs);
+        updateVotes();
       } catch (e) {
         console.log('Error, getDog: ', e)
       }
