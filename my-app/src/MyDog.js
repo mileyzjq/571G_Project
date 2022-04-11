@@ -32,6 +32,7 @@ const MyDog =(props)=> {
 
     const uploadDogCard =()=> {
         getVote();
+        getDogInfo();
     }
 
     const getDogInfo = async() => {
