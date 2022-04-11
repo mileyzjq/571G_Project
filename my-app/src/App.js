@@ -52,7 +52,7 @@ class App extends React.Component {
       right: <span>
           <Button type="primary" style={{marginRight: 20}} onClick={this.getAccount}>Connect Wallet</Button>
           <Button type="primary" style={{marginRight: 20}} onClick={this.handleShowVote}>Buy Vote</Button>
-          <Button type="primary" style={{marginRight: 20}} onClick={this.getVote}>Info</Button>
+          {/*<Button type="primary" style={{marginRight: 20}} onClick={this.getVote}>Info</Button>*/}
           </span>
     };
   };
