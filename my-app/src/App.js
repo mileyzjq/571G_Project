@@ -5,7 +5,6 @@ import Home from './Home';
 import 'antd/dist/antd.css';
 import Icon from './image/icon.webp';
 import React, { useState } from 'react';
-import { UserOutlined, LockOutlined, RightOutlined, CloseOutlined } from '@ant-design/icons';
 // import Web3 from 'web3';
 import Web3 from 'web3/dist/web3.min.js';
 import PuppyVote from './abis/PuppyVote.json';
